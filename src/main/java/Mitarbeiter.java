@@ -35,4 +35,16 @@ public class Mitarbeiter {
         this.vorgesid = vorgesid;
         this.geburtsdatum = geburtsdatum;
     }
+
+    public int getMid() {
+        return mid;
+    }
+
+    public int getFid() {
+        return fid;
+    }
+
+    public int getVorgesid() {
+        return vorgesid;
+    }
 }

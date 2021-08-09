@@ -1,4 +1,4 @@
-public class Filiale {
+public class Filiale{
     int fid;
     String strasse;
     int plz;

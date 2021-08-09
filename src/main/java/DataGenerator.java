@@ -43,6 +43,10 @@ public class DataGenerator {
     public double generateRandomDecimal(double min, double max){
         return min + Math.random() * (max - min);
     }
+
+    public int getRandomNumber(int max) {
+        return (int) (Math.random() * max);
+    }
 }
 
 

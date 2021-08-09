@@ -6,10 +6,10 @@ import static java.sql.Types.NULL;
 
 public class WinDBoe extends DataGenerator {
 
-    ArrayList Filialen = new ArrayList();
-    ArrayList Mitarbeiter = new ArrayList();
-    ArrayList Produkte = new ArrayList();
-    ArrayList Verkäufe = new ArrayList();
+    ArrayList<Filiale> Filialen = new ArrayList<>();
+    ArrayList<Produkt> Produkte = new ArrayList<>();
+    ArrayList<Verkauf> Verkäufe = new ArrayList<>();
+    ArrayList<Mitarbeiter> Mitarbeiter = new ArrayList<>();
 
     public static void main(String[] args) {
         WinDBoe winDBoe = new WinDBoe();
@@ -23,7 +23,7 @@ public class WinDBoe extends DataGenerator {
         super.closeConnection();
     }
 
-    //Um neue ID zu ermitteln, die höchste ID auslesen
+    //Find latest ID
     public int getHighestID(String query, String column) {
         int highestID = -1;
         try {
@@ -41,13 +41,13 @@ public class WinDBoe extends DataGenerator {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.exit(0);
         }
-        if(highestID == -1){
+        if (highestID == -1) {
             throw new NullPointerException("Parameter checken!");
         }
         return highestID;
     }
 
-    //Relevante Attribute von Klassen auslesen & speichern
+    //Get data from database
     public void getProdukte() {
         try {
             stmt = c.createStatement();
@@ -93,8 +93,7 @@ public class WinDBoe extends DataGenerator {
 
                 if (fid != NULL) {
                     Mitarbeiter.add(new Mitarbeiter(mid, fid));
-                }
-                else{
+                } else {
                     Mitarbeiter.add(new Mitarbeiter(mid));
                 }
             }
@@ -105,13 +104,44 @@ public class WinDBoe extends DataGenerator {
         }
     }
 
+    //Insert data in database
     public void createVerkauf() {
         int vid = getHighestID("SELECT * FROM verkauf;", "vid") + 1;
-        int fid = Collections.shuffle(Filialen).getFID();
+
+        //choose Filiale
+        Filiale filiale = Filialen.get(getRandomNumber(Filialen.size() - 1));
+        int fid = filiale.getFid();
+
+        //select all Mitarbeiter from random Filiale
+        ArrayList<Mitarbeiter> FilialenMitarbeiter = new ArrayList<>();
+        for (Mitarbeiter m : Mitarbeiter) {
+            if (m.getFid() == fid) {
+                FilialenMitarbeiter.add(m);             //note: fid is not null in database
+            }
+        }
+
+        //choose Mitarbeiter
+        Mitarbeiter m = FilialenMitarbeiter.get(getRandomNumber(FilialenMitarbeiter.size() - 1));
+        int mid = m.getMid();
+
+        //choose Produkte
+        int numberOfProdukte = 1 + getRandomNumber(14);         //note: Produkteanzahl can't be 0
+        ArrayList<Produkt> buyed = new ArrayList<>();
+
+        for (int i = 0; i < numberOfProdukte; i++) {
+            buyed.add(Produkte.get(getRandomNumber(Produkte.size() - 1)));
+        }
+
+        for (Produkt p : buyed) {
+            int count = Collections.frequency(buyed, p.getPid());
+        }
 
 
+        //Now finally create Verkauf
         //TODO: Parameter anpassen, wenn gewünscht!
-        Verkäufe.add(new Verkauf(vid, super.generateRandomDate(2021, 2021), super.generateRandomDecimal(10.0, 35.0), ));
+        if (mid != -1) {
+            Verkauf v = new Verkauf(vid, super.generateRandomDate(2021, 2021), super.generateRandomDecimal(10.0, 35.0), fid, mid);
+        }
     }
 }
 
