@@ -28,6 +28,22 @@ public class DataGenerator {
 
         }
     }
+
+    //--------------Usefull generators for all Databases-----------------------
+
+    public Date generateRandomDate(int min, int max) {
+        int startYear = min;
+        int endYear = max;
+        long start = Timestamp.valueOf(startYear + 1 + "-1-1 0:0:0").getTime();
+        long end = Timestamp.valueOf(endYear + "-1-1 0:0:0").getTime();
+        long ms = (long) ((end - start) * Math.random() + start);
+        return new Date(ms);
+    }
+
+    public double generateRandomDecimal(double min, double max){
+        return min + Math.random() * (max - min);
+    }
 }
+
 
 

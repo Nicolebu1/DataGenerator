@@ -1,17 +1,17 @@
 public class Produkt {
     int pid;
     String bezeichnung;
-    float herstellungspreis;
-    float verkaufspreis;
+    double herstellungspreis;
+    double verkaufspreis;
     int lagerbestand;
     String kategorie;
 
-    public Produkt(int pid, float preis){
+    public Produkt(int pid, double preis){
         this.pid = pid;
         this.herstellungspreis = preis;
     }
 
-    public Produkt(int pid, String bezeichnung, float herstellungspreis, float verkaufspreis, int lagerbestand, String kategorie) {
+    public Produkt(int pid, String bezeichnung, double herstellungspreis, double verkaufspreis, int lagerbestand, String kategorie) {
         this.pid = pid;
         this.bezeichnung = bezeichnung;
         this.herstellungspreis = herstellungspreis;
@@ -24,7 +24,7 @@ public class Produkt {
         return pid;
     }
 
-    public float getHerstellungspreis() {
+    public double getHerstellungspreis() {
         return herstellungspreis;
     }
 }

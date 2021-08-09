@@ -7,7 +7,7 @@ public class Mitarbeiter {
     String strasse;
     int plz;
     String ort;
-    float bg;
+    double bg;
     String taetigkeit;
     int fid;
     int vorgesid;
@@ -22,7 +22,7 @@ public class Mitarbeiter {
         this.fid = fid;
     }
 
-    public Mitarbeiter(int mid, String vorname, String nachname, String strasse, int plz, String ort, float bg, String taetigkeit, int fid, int vorgesid, Date geburtsdatum) {
+    public Mitarbeiter(int mid, String vorname, String nachname, String strasse, int plz, String ort, double bg, String taetigkeit, int fid, int vorgesid, Date geburtsdatum) {
         this.mid = mid;
         this.vorname = vorname;
         this.nachname = nachname;

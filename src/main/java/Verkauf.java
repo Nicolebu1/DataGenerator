@@ -3,13 +3,14 @@ import java.sql.Date;
 public class Verkauf {
     int vid;
     Date verkaufsdatum;
-    float rechnungsbetrag;
-    float provision;
+    double rechnungsbetrag;
+    double provision;
     int kdid;
     int fid;
     int mid;
 
-    public Verkauf(int vid, Date verkaufsdatum, float rechnungsbetrag, int fid, int mid) {
+    //if customer isn't registered
+    public Verkauf(int vid, Date verkaufsdatum, double rechnungsbetrag, int fid, int mid) {
         this.vid = vid;
         this.verkaufsdatum = verkaufsdatum;
         this.rechnungsbetrag = rechnungsbetrag;
@@ -17,7 +18,8 @@ public class Verkauf {
         this.mid = mid;
     }
 
-    public Verkauf(int vid, Date verkaufsdatum, float rechnungsbetrag, float provision, int kdid, int fid, int mid) {
+    //if customer is registered
+    public Verkauf(int vid, Date verkaufsdatum, double rechnungsbetrag, double provision, int kdid, int fid, int mid) {
         this.vid = vid;
         this.verkaufsdatum = verkaufsdatum;
         this.rechnungsbetrag = rechnungsbetrag;

@@ -14,4 +14,8 @@ public class Filiale {
         this.plz = plz;
         this.ort = ort;
     }
+
+    public int getFid() {
+        return fid;
+    }
 }

@@ -1,13 +1,15 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import static java.sql.Types.NULL;
 
 public class WinDBoe extends DataGenerator {
 
-    int highestVID;
-    Filiale[] Filialen;
-    Mitarbeiter[] Mitarbeiter;
-    Produkt[] Produkte;
+    ArrayList Filialen = new ArrayList();
+    ArrayList Mitarbeiter = new ArrayList();
+    ArrayList Produkte = new ArrayList();
+    ArrayList Verkäufe = new ArrayList();
 
     public static void main(String[] args) {
         WinDBoe winDBoe = new WinDBoe();
@@ -15,24 +17,22 @@ public class WinDBoe extends DataGenerator {
 
     public WinDBoe() {
         super.createConnection("jdbc:postgresql://localhost:5432/WinDBoe");
-        getVID();
         getFilialen();
         getMitarbeiter();
         getProdukte();
-        System.out.println("hi");
         super.closeConnection();
     }
 
-    //Um neue VerkaufsID zu ermitteln, die höchste ID auslesen
-    public void getVID() {
+    //Um neue ID zu ermitteln, die höchste ID auslesen
+    public int getHighestID(String query, String column) {
+        int highestID = -1;
         try {
             stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM verkauf;");
+            ResultSet rs = stmt.executeQuery(query);
             int i = 0;
-            highestVID = 0;
             while (rs.next()) {
-                if (rs.getInt("vid") > highestVID) {
-                    highestVID = rs.getInt("vid");
+                if (rs.getInt(column) > highestID) {
+                    highestID = rs.getInt(column);
                 }
                 i++;
             }
@@ -41,6 +41,10 @@ public class WinDBoe extends DataGenerator {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.exit(0);
         }
+        if(highestID == -1){
+            throw new NullPointerException("Parameter checken!");
+        }
+        return highestID;
     }
 
     //Relevante Attribute von Klassen auslesen & speichern
@@ -51,8 +55,8 @@ public class WinDBoe extends DataGenerator {
             int i = 0;
             while (rs.next()) {
                 int pid = rs.getInt("pid");
-                float preis = rs.getFloat("verkaufspreis");
-                Produkte[i] = new Produkt(pid, preis);
+                double preis = rs.getDouble("verkaufspreis");
+                Produkte.add(new Produkt(pid, preis));
             }
             rs.close();
         } catch (Exception e) {
@@ -68,7 +72,8 @@ public class WinDBoe extends DataGenerator {
             int i = 0;
             while (rs.next()) {
                 int fid = rs.getInt("fid");
-                Filialen[i] = new Filiale(fid);
+                Filialen.add(new Filiale(fid));
+                i++;
             }
             rs.close();
         } catch (Exception e) {
@@ -87,10 +92,10 @@ public class WinDBoe extends DataGenerator {
                 int fid = rs.getInt("fid");
 
                 if (fid != NULL) {
-                    Mitarbeiter[i] = new Mitarbeiter(mid, fid);
+                    Mitarbeiter.add(new Mitarbeiter(mid, fid));
                 }
                 else{
-                    Mitarbeiter[i] = new Mitarbeiter(mid);
+                    Mitarbeiter.add(new Mitarbeiter(mid));
                 }
             }
             rs.close();
@@ -100,13 +105,13 @@ public class WinDBoe extends DataGenerator {
         }
     }
 
-    public int getHighestVID() {
-        return highestVID;
-    }
-
     public void createVerkauf() {
-        int vid = getHighestVID() + 1;
+        int vid = getHighestID("SELECT * FROM verkauf;", "vid") + 1;
+        int fid = Collections.shuffle(Filialen).getFID();
 
+
+        //TODO: Parameter anpassen, wenn gewünscht!
+        Verkäufe.add(new Verkauf(vid, super.generateRandomDate(2021, 2021), super.generateRandomDecimal(10.0, 35.0), ));
     }
 }
 
