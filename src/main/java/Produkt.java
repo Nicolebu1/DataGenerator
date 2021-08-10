@@ -24,7 +24,7 @@ public class Produkt {
         return pid;
     }
 
-    public double getHerstellungspreis() {
-        return herstellungspreis;
+    public double getVerkaufspreis() {
+        return verkaufspreis;
     }
 }

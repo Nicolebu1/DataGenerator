@@ -1,6 +1,5 @@
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 
 import static java.sql.Types.NULL;
 
@@ -20,6 +19,7 @@ public class WinDBoe extends DataGenerator {
         getFilialen();
         getMitarbeiter();
         getProdukte();
+        createVerkauf();
         super.closeConnection();
     }
 
@@ -132,9 +132,22 @@ public class WinDBoe extends DataGenerator {
             buyed.add(Produkte.get(getRandomNumber(Produkte.size() - 1)));
         }
 
-        for (Produkt p : buyed) {
-            int count = Collections.frequency(buyed, p.getPid());
+        //count different Produkte
+        Map<Integer,Integer> menge = new HashMap();
+        for(Produkt p : buyed){
+            if(menge.containsKey(p.getPid())){
+                menge.put(p.getPid(), menge.get(p.getPid())+1);
+            }else{
+                menge.put(p.getPid() ,1);
+            }
         }
+
+        System.out.println("Hier kommt die Listääääää");
+        for(Map.Entry<Integer, Integer> entry : menge.entrySet()){
+                System.out.println(entry.getKey() + " : " + entry.getValue());
+        }
+
+        //calculate price
 
 
         //Now finally create Verkauf
