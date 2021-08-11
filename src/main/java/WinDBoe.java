@@ -133,27 +133,37 @@ public class WinDBoe extends DataGenerator {
         }
 
         //count different Produkte
-        Map<Integer,Integer> menge = new HashMap();
-        for(Produkt p : buyed){
-            if(menge.containsKey(p.getPid())){
-                menge.put(p.getPid(), menge.get(p.getPid())+1);
-            }else{
-                menge.put(p.getPid() ,1);
+        Map<Integer, Integer> menge = new HashMap();
+        for (Produkt p : buyed) {
+            if (menge.containsKey(p.getPid())) {
+                menge.put(p.getPid(), menge.get(p.getPid()) + 1);
+            } else {
+                menge.put(p.getPid(), 1);
             }
         }
 
-        System.out.println("Hier kommt die Listääääää");
-        for(Map.Entry<Integer, Integer> entry : menge.entrySet()){
-                System.out.println(entry.getKey() + " : " + entry.getValue());
+        //calculate price
+        double verkaufspreis = 0;
+        for (Produkt p : buyed) {
+            verkaufspreis = verkaufspreis + p.getVerkaufspreis();
         }
 
-        //calculate price
-
+        //round to 2 decimal places
+        verkaufspreis = Math.round(verkaufspreis * 100.0) / 100.0;
 
         //Now finally create Verkauf
         //TODO: Parameter anpassen, wenn gewünscht!
         if (mid != -1) {
-            Verkauf v = new Verkauf(vid, super.generateRandomDate(2021, 2021), super.generateRandomDecimal(10.0, 35.0), fid, mid);
+            Verkauf v = new Verkauf(vid, super.generateRandomDate(2021, 2021), verkaufspreis, fid, mid);
+        }
+
+        try {
+            stmt = c.createStatement();
+            System.out.println(super.generateRandomDate(2021, 2021));
+            String sql = "INSERT INTO Verkauf VALUES (" + vid + "," + super.generateRandomDate(2021, 2021) + "," + verkaufspreis + "," + fid + "," + mid + ");";
+            stmt.executeUpdate(sql);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 }

@@ -6,9 +6,9 @@ public class Produkt {
     int lagerbestand;
     String kategorie;
 
-    public Produkt(int pid, double preis){
+    public Produkt(int pid, double verkaufspreis){
         this.pid = pid;
-        this.herstellungspreis = preis;
+        this.verkaufspreis = verkaufspreis;
     }
 
     public Produkt(int pid, String bezeichnung, double herstellungspreis, double verkaufspreis, int lagerbestand, String kategorie) {
@@ -27,4 +27,6 @@ public class Produkt {
     public double getVerkaufspreis() {
         return verkaufspreis;
     }
+
+
 }
