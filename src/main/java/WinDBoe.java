@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
 import static java.sql.Types.NULL;
@@ -155,12 +156,17 @@ public class WinDBoe extends DataGenerator {
         //TODO: Parameter anpassen, wenn gewünscht!
         if (mid != -1) {
             Verkauf v = new Verkauf(vid, super.generateRandomDate(2021, 2021), verkaufspreis, fid, mid);
+            //System.out.println(vid + ", " + super.generateRandomDate(2021, 2021) + ", " + verkaufspreis + ", " + fid + ", " + mid);
         }
 
         try {
             stmt = c.createStatement();
-            System.out.println(super.generateRandomDate(2021, 2021));
-            String sql = "INSERT INTO Verkauf VALUES (" + vid + "," + super.generateRandomDate(2021, 2021) + "," + verkaufspreis + "," + fid + "," + mid + ");";
+
+            Date date = super.generateRandomDate(2021, 2021);
+
+            String sql = "INSERT INTO Verkauf (vid, verkaufsdatum, rechnungsbetrag, fid, mid) " +
+                    "     VALUES (" + vid + ", '" + date + "'," + verkaufspreis + "," + fid + "," + mid + ");";
+
             stmt.executeUpdate(sql);
         } catch (Exception e) {
             System.out.println(e.getMessage());
