@@ -1,3 +1,5 @@
+package WinDBoe;
+
 public class Menge {
     int vid;
     int pid;

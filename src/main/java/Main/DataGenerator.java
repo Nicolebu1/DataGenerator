@@ -1,9 +1,11 @@
+package Main;
+
 import java.sql.*;
 
 public class DataGenerator {
 
-    static Connection c = null;
-    static Statement stmt = null;
+    public static Connection c = null;
+    public static Statement stmt = null;
 
     public void createConnection(String url) {
         try {
@@ -11,7 +13,7 @@ public class DataGenerator {
             c = DriverManager
                     .getConnection(url,
                             "postgres", "0000");
-            c.setAutoCommit(false);
+            c.setAutoCommit(true);
             System.out.println("Connection successful");
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());

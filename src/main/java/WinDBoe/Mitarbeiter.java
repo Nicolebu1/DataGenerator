@@ -1,3 +1,5 @@
+package WinDBoe;
+
 import java.sql.Date;
 
 public class Mitarbeiter {

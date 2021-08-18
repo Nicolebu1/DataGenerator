@@ -1,3 +1,5 @@
+package WinDBoe;
+
 public class Filiale{
     int fid;
     String strasse;

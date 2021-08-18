@@ -1,15 +1,18 @@
+package WinDBoe;
+
 import java.sql.*;
-import java.sql.Date;
 import java.util.*;
 
 import static java.sql.Types.NULL;
 
+import Main.DataGenerator;
+
 public class WinDBoe extends DataGenerator {
 
-    ArrayList<Filiale> Filialen = new ArrayList<>();
-    ArrayList<Produkt> Produkte = new ArrayList<>();
-    ArrayList<Verkauf> Verkäufe = new ArrayList<>();
-    ArrayList<Mitarbeiter> Mitarbeiter = new ArrayList<>();
+    public ArrayList<Filiale> Filialen = new ArrayList<>();
+    public ArrayList<Produkt> Produkte = new ArrayList<>();
+    public ArrayList<Verkauf> Verkäufe = new ArrayList<>();
+    public ArrayList<Mitarbeiter> Mitarbeiter = new ArrayList<>();
 
     public static void main(String[] args) {
         WinDBoe winDBoe = new WinDBoe();
@@ -21,15 +24,15 @@ public class WinDBoe extends DataGenerator {
         getMitarbeiter();
         getProdukte();
         createVerkauf();
-        super.closeConnection();
+        //super.closeConnection();
     }
 
     //Find latest ID
     public int getHighestID(String query, String column) {
         int highestID = -1;
         try {
-            stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery(query);
             int i = 0;
             while (rs.next()) {
                 if (rs.getInt(column) > highestID) {
@@ -51,8 +54,8 @@ public class WinDBoe extends DataGenerator {
     //Get data from database
     public void getProdukte() {
         try {
-            stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT pid, verkaufspreis FROM produkt;");
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT pid, verkaufspreis FROM produkt;");
             int i = 0;
             while (rs.next()) {
                 int pid = rs.getInt("pid");
@@ -68,8 +71,8 @@ public class WinDBoe extends DataGenerator {
 
     public void getFilialen() {
         try {
-            stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT fid FROM filiale;");
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT fid FROM filiale;");
             int i = 0;
             while (rs.next()) {
                 int fid = rs.getInt("fid");
@@ -85,8 +88,8 @@ public class WinDBoe extends DataGenerator {
 
     public void getMitarbeiter() {
         try {
-            stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT mid, fid FROM mitarbeiter;");
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT mid, fid FROM mitarbeiter;");
             int i = 0;
             while (rs.next()) {
                 int mid = rs.getInt("mid");
@@ -113,7 +116,7 @@ public class WinDBoe extends DataGenerator {
         Filiale filiale = Filialen.get(getRandomNumber(Filialen.size() - 1));
         int fid = filiale.getFid();
 
-        //select all Mitarbeiter from random Filiale
+        //select all Mitarbeiter from choosen Filiale
         ArrayList<Mitarbeiter> FilialenMitarbeiter = new ArrayList<>();
         for (Mitarbeiter m : Mitarbeiter) {
             if (m.getFid() == fid) {
@@ -152,26 +155,28 @@ public class WinDBoe extends DataGenerator {
         //round to 2 decimal places
         verkaufspreis = Math.round(verkaufspreis * 100.0) / 100.0;
 
-        //Now finally create Verkauf
+        //Now finally create WinDBoe.Verkauf
         //TODO: Parameter anpassen, wenn gewünscht!
         if (mid != -1) {
             Verkauf v = new Verkauf(vid, super.generateRandomDate(2021, 2021), verkaufspreis, fid, mid);
-            //System.out.println(vid + ", " + super.generateRandomDate(2021, 2021) + ", " + verkaufspreis + ", " + fid + ", " + mid);
         }
 
         try {
-            stmt = c.createStatement();
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            String sql = "INSERT INTO verkauf (vid, verkaufsdatum, rechnungsbetrag, fid, mid) " + "VALUES (" + vid + ", '" + super.generateRandomDate(2021, 2021) + "', " + verkaufspreis + "," + fid + "," + mid + ");";
+            System.out.println(sql);
+            DataGenerator.stmt.execute(sql);
+            System.out.println("Inserted.");
 
-            Date date = super.generateRandomDate(2021, 2021);
-
-            String sql = "INSERT INTO Verkauf (vid, verkaufsdatum, rechnungsbetrag, fid, mid) " +
-                    "     VALUES (" + vid + ", '" + date + "'," + verkaufspreis + "," + fid + "," + mid + ");";
-
-            stmt.executeUpdate(sql);
+            for (Produkt p : buyed) {
+                if (menge.containsKey(p.getPid())) {
+                    menge.put(p.getPid(), menge.get(p.getPid()) + 1);
+                } else {
+                    menge.put(p.getPid(), 1);
+                }
+            }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 }
-
-

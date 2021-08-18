@@ -1,3 +1,5 @@
+package WinDBoe;
+
 public class Produkt {
     int pid;
     String bezeichnung;
