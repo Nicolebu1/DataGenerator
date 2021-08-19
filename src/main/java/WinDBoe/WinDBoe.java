@@ -1,18 +1,15 @@
 package WinDBoe;
-
 import java.sql.*;
 import java.util.*;
-
 import static java.sql.Types.NULL;
-
 import Main.DataGenerator;
 
 public class WinDBoe extends DataGenerator {
 
-    public ArrayList<Filiale> Filialen = new ArrayList<>();
-    public ArrayList<Produkt> Produkte = new ArrayList<>();
-    public ArrayList<Verkauf> Verkäufe = new ArrayList<>();
-    public ArrayList<Mitarbeiter> Mitarbeiter = new ArrayList<>();
+    ArrayList<Filiale> Filialen = new ArrayList<>();
+    ArrayList<Produkt> Produkte = new ArrayList<>();
+    ArrayList<Verkauf> Verkäufe = new ArrayList<>();
+    ArrayList<Mitarbeiter> Mitarbeiter = new ArrayList<>();
 
     public static void main(String[] args) {
         WinDBoe winDBoe = new WinDBoe();
@@ -24,10 +21,10 @@ public class WinDBoe extends DataGenerator {
         getMitarbeiter();
         getProdukte();
         createVerkauf();
-        //super.closeConnection();
+        super.closeConnection();
     }
 
-    //Find latest ID
+    //find latest ID
     public int getHighestID(String query, String column) {
         int highestID = -1;
         try {
@@ -51,7 +48,7 @@ public class WinDBoe extends DataGenerator {
         return highestID;
     }
 
-    //Get data from database
+    //get data from database
     public void getProdukte() {
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
@@ -108,7 +105,7 @@ public class WinDBoe extends DataGenerator {
         }
     }
 
-    //Insert data in database
+    //insert data in database
     public void createVerkauf() {
         int vid = getHighestID("SELECT * FROM verkauf;", "vid") + 1;
 
@@ -137,12 +134,12 @@ public class WinDBoe extends DataGenerator {
         }
 
         //count different Produkte
-        Map<Integer, Integer> menge = new HashMap();
+        Map<Integer, Integer> verkaufsposition = new HashMap();
         for (Produkt p : buyed) {
-            if (menge.containsKey(p.getPid())) {
-                menge.put(p.getPid(), menge.get(p.getPid()) + 1);
+            if (verkaufsposition.containsKey(p.getPid())) {
+                verkaufsposition.put(p.getPid(), verkaufsposition.get(p.getPid()) + 1);
             } else {
-                menge.put(p.getPid(), 1);
+                verkaufsposition.put(p.getPid(), 1);
             }
         }
 
@@ -155,26 +152,33 @@ public class WinDBoe extends DataGenerator {
         //round to 2 decimal places
         verkaufspreis = Math.round(verkaufspreis * 100.0) / 100.0;
 
-        //Now finally create WinDBoe.Verkauf
+        //now finally create Verkauf
         //TODO: Parameter anpassen, wenn gewünscht!
         if (mid != -1) {
             Verkauf v = new Verkauf(vid, super.generateRandomDate(2021, 2021), verkaufspreis, fid, mid);
         }
 
+        //insert into Database
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
-            String sql = "INSERT INTO verkauf (vid, verkaufsdatum, rechnungsbetrag, fid, mid) " + "VALUES (" + vid + ", '" + super.generateRandomDate(2021, 2021) + "', " + verkaufspreis + "," + fid + "," + mid + ");";
-            System.out.println(sql);
+
+            //insert into Verkauf
+            String sql = "INSERT INTO verkauf (vid, verkaufsdatum, rechnungsbetrag, fid, mid) " + "VALUES (" + vid + ", '" + super.generateRandomDate(2021, 2021) + "', " + verkaufspreis + " ," + fid + " ," + mid + ");";
             DataGenerator.stmt.execute(sql);
+            System.out.println(sql);
             System.out.println("Inserted.");
 
-            for (Produkt p : buyed) {
-                if (menge.containsKey(p.getPid())) {
-                    menge.put(p.getPid(), menge.get(p.getPid()) + 1);
-                } else {
-                    menge.put(p.getPid(), 1);
+            //insert into Verkaufsposition
+            verkaufsposition.forEach((key, value) -> {
+                String sql2 = "INSERT INTO verkaufsposition (menge, vid, pid) " + "VALUES (" + value + ", " + vid + ", " + key + ");";
+                try {
+                    DataGenerator.stmt.execute(sql2);
+                    System.out.println(sql2);
+                    System.out.println("Inserted");
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
                 }
-            }
+            });
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
