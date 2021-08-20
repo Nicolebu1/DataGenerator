@@ -31,6 +31,30 @@ public class DataGenerator {
         }
     }
 
+    //get latest ID
+    public int getHighestID(String query, String column) {
+        int highestID = -1;
+        try {
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery(query);
+            int i = 0;
+            while (rs.next()) {
+                if (rs.getInt(column) > highestID) {
+                    highestID = rs.getInt(column);
+                }
+                i++;
+            }
+            rs.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+        if (highestID == -1) {
+            throw new NullPointerException("Parameter checken!");
+        }
+        return highestID;
+    }
+
     //--------------Usefull generators for all Databases-----------------------
 
     public Date generateRandomDate(int min, int max) {
@@ -42,12 +66,22 @@ public class DataGenerator {
         return new Date(ms);
     }
 
-    public double generateRandomDecimal(double min, double max){
+    public double generateRandomDecimal(double min, double max) {
         return min + Math.random() * (max - min);
     }
 
     public int getRandomNumber(int max) {
         return (int) (Math.random() * max);
+    }
+
+    public Adresse getRandomAdress() {
+        Adresse newAdress = new Adresse();
+        newAdress.setRandomStrasse();
+        newAdress.setRandomOrt();
+        newAdress.setRandomPlz();
+        newAdress.setRandomLaengengrad();
+        newAdress.setRandomBreitengrad();
+        return newAdress;
     }
 }
 

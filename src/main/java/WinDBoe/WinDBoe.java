@@ -25,28 +25,7 @@ public class WinDBoe extends DataGenerator {
     }
 
     //find latest ID
-    public int getHighestID(String query, String column) {
-        int highestID = -1;
-        try {
-            DataGenerator.stmt = DataGenerator.c.createStatement();
-            ResultSet rs = DataGenerator.stmt.executeQuery(query);
-            int i = 0;
-            while (rs.next()) {
-                if (rs.getInt(column) > highestID) {
-                    highestID = rs.getInt(column);
-                }
-                i++;
-            }
-            rs.close();
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.exit(0);
-        }
-        if (highestID == -1) {
-            throw new NullPointerException("Parameter checken!");
-        }
-        return highestID;
-    }
+
 
     //get data from database
     public void getProdukte() {
@@ -107,7 +86,7 @@ public class WinDBoe extends DataGenerator {
 
     //insert data in database
     public void createVerkauf() {
-        int vid = getHighestID("SELECT * FROM verkauf;", "vid") + 1;
+        int vid = super.getHighestID("SELECT * FROM verkauf;", "vid") + 1;
 
         //choose Filiale
         Filiale filiale = Filialen.get(getRandomNumber(Filialen.size() - 1));
