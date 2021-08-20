@@ -24,8 +24,6 @@ public class WinDBoe extends DataGenerator {
         super.closeConnection();
     }
 
-    //find latest ID
-
 
     //get data from database
     public void getProdukte() {
@@ -45,6 +43,7 @@ public class WinDBoe extends DataGenerator {
         }
     }
 
+
     public void getFilialen() {
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
@@ -61,6 +60,7 @@ public class WinDBoe extends DataGenerator {
             System.exit(0);
         }
     }
+
 
     public void getMitarbeiter() {
         try {
@@ -83,6 +83,7 @@ public class WinDBoe extends DataGenerator {
             System.exit(0);
         }
     }
+
 
     //insert data in database
     public void createVerkauf() {
@@ -161,5 +162,10 @@ public class WinDBoe extends DataGenerator {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+
+    public void generateMitarbeiter(){
+
     }
 }

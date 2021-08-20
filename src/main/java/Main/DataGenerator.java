@@ -1,11 +1,14 @@
 package Main;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.*;
 
 public class DataGenerator {
 
     public static Connection c = null;
     public static Statement stmt = null;
+
 
     public void createConnection(String url) {
         try {
@@ -21,6 +24,7 @@ public class DataGenerator {
         }
     }
 
+
     public void closeConnection() {
         try {
             stmt.close();
@@ -30,6 +34,7 @@ public class DataGenerator {
 
         }
     }
+
 
     //get latest ID
     public int getHighestID(String query, String column) {
@@ -55,6 +60,7 @@ public class DataGenerator {
         return highestID;
     }
 
+
     //--------------Usefull generators for all Databases-----------------------
 
     public Date generateRandomDate(int min, int max) {
@@ -66,13 +72,16 @@ public class DataGenerator {
         return new Date(ms);
     }
 
+
     public double generateRandomDecimal(double min, double max) {
         return min + Math.random() * (max - min);
     }
 
+
     public int getRandomNumber(int max) {
         return (int) (Math.random() * max);
     }
+
 
     public Adresse getRandomAdress() {
         Adresse newAdress = new Adresse();
@@ -82,6 +91,44 @@ public class DataGenerator {
         newAdress.setRandomLaengengrad();
         newAdress.setRandomBreitengrad();
         return newAdress;
+    }
+
+
+    public Name generateRandomName(char g) throws URISyntaxException, IOException {
+        Namen namen = new Namen();
+
+        String vorname = null;
+        String nachname;
+
+        if (g == 'f' || g == 'F' || g == 'w' || g == 'W') {
+            vorname = namen.getVornamenW().get(getRandomNumber(namen.getVornamenW().size() - 1));
+        } else if (g == 'm' || g == 'M') {
+            vorname = namen.getVornamenM().get(getRandomNumber(namen.getVornamenM().size() - 1));
+        }
+        nachname = namen.getNachnamen().get(getRandomNumber(namen.getNachnamen().size() - 1));
+
+        return new Name(vorname, nachname);
+    }
+
+
+    public Name generateRandomName() throws URISyntaxException, IOException {
+        Namen namen = new Namen();
+
+        String vorname = null;
+        String nachname;
+
+        int g = getRandomNumber(1);
+
+        //Todo: Option für Nicht Binäre Namen!
+
+        if (g == 0) {
+            vorname = namen.getVornamenW().get(getRandomNumber(namen.getVornamenW().size() - 1));
+        } else {
+            vorname = namen.getVornamenM().get(getRandomNumber(namen.getVornamenM().size() - 1));
+        }
+        nachname = namen.getNachnamen().get(getRandomNumber(namen.getNachnamen().size() - 1));
+
+        return new Name(vorname, nachname);
     }
 }
 
