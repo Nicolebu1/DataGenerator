@@ -6,14 +6,15 @@ public class Mitarbeiter {
     int mid;
     String vorname;
     String nachname;
+    Date geburtsdatum;
     String strasse;
     int plz;
     String ort;
     double bg;
-    String taetigkeit;
+    Enum taetigkeit;
     int fid;
     int vorgesid;
-    Date geburtsdatum;
+    int maid;
 
     public Mitarbeiter(int mid) {
         this.mid = mid;
@@ -24,10 +25,11 @@ public class Mitarbeiter {
         this.fid = fid;
     }
 
-    public Mitarbeiter(int mid, String vorname, String nachname, String strasse, int plz, String ort, double bg, String taetigkeit, int fid, int vorgesid, Date geburtsdatum) {
+    public Mitarbeiter(int mid, String vorname, String nachname, Date geburtsdatum, String strasse, int plz, String ort, double bg, Enum taetigkeit, int fid, int vorgesid, int maid) {
         this.mid = mid;
         this.vorname = vorname;
         this.nachname = nachname;
+        this.geburtsdatum = geburtsdatum;
         this.strasse = strasse;
         this.plz = plz;
         this.ort = ort;
@@ -35,7 +37,7 @@ public class Mitarbeiter {
         this.taetigkeit = taetigkeit;
         this.fid = fid;
         this.vorgesid = vorgesid;
-        this.geburtsdatum = geburtsdatum;
+        this.maid = maid;
     }
 
     public int getMid() {
@@ -50,5 +52,43 @@ public class Mitarbeiter {
         return vorgesid;
     }
 
+    public String getVorname() {
+        return vorname;
+    }
 
+    public String getNachname() {
+        return nachname;
+    }
+
+    public Date getGeburtsdatum() {
+        return geburtsdatum;
+    }
+
+    public String getStrasse() {
+        return strasse;
+    }
+
+    public int getPlz() {
+        return plz;
+    }
+
+    public String getOrt() {
+        return ort;
+    }
+
+    public double getBg() {
+        return bg;
+    }
+
+    public Enum getTaetigkeit() {
+        return taetigkeit;
+    }
+
+    public int getMaid() {
+        return maid;
+    }
+}
+
+enum Taetigkeit{
+    Konditor, Bäcker, Verkauf, Personalmanagement,
 }

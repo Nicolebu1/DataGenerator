@@ -1,8 +1,16 @@
 package WinDBoe;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
+
+import static WinDBoe.Taetigkeit.Bäcker;
 import static java.sql.Types.NULL;
+
+import Main.Adresse;
 import Main.DataGenerator;
+import Main.Name;
 
 public class WinDBoe extends DataGenerator {
 
@@ -11,16 +19,16 @@ public class WinDBoe extends DataGenerator {
     ArrayList<Verkauf> Verkäufe = new ArrayList<>();
     ArrayList<Mitarbeiter> Mitarbeiter = new ArrayList<>();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException, IOException {
         WinDBoe winDBoe = new WinDBoe();
     }
 
-    public WinDBoe() {
+    public WinDBoe() throws URISyntaxException, IOException {
         super.createConnection("jdbc:postgresql://localhost:5432/WinDBoe");
         getFilialen();
         getMitarbeiter();
         getProdukte();
-        createVerkauf();
+        generateMitarbeiter();
         super.closeConnection();
     }
 
@@ -84,14 +92,11 @@ public class WinDBoe extends DataGenerator {
         }
     }
 
+    public Filiale getRandomFiliale(){
+        return Filialen.get(getRandomNumber(Filialen.size() - 1));
+    }
 
-    //insert data in database
-    public void createVerkauf() {
-        int vid = super.getHighestID("SELECT * FROM verkauf;", "vid") + 1;
-
-        //choose Filiale
-        Filiale filiale = Filialen.get(getRandomNumber(Filialen.size() - 1));
-        int fid = filiale.getFid();
+    public Mitarbeiter getRandomMitarbeiterFromFiliale(int fid){
 
         //select all Mitarbeiter from choosen Filiale
         ArrayList<Mitarbeiter> FilialenMitarbeiter = new ArrayList<>();
@@ -100,10 +105,21 @@ public class WinDBoe extends DataGenerator {
                 FilialenMitarbeiter.add(m);             //note: fid is not null in database
             }
         }
-
         //choose Mitarbeiter
-        Mitarbeiter m = FilialenMitarbeiter.get(getRandomNumber(FilialenMitarbeiter.size() - 1));
-        int mid = m.getMid();
+        return FilialenMitarbeiter.get(getRandomNumber(FilialenMitarbeiter.size() - 1));
+    }
+
+
+    //insert data in database
+    public void generateVerkauf() {
+        int vid = super.getHighestID("SELECT * FROM verkauf;", "vid") + 1;
+
+        //choose Filiale
+        Filiale filiale = getRandomFiliale();
+        int fid = filiale.getFid();
+
+        //choose Random Mitarbeiter from Filiale
+        int mid = getRandomMitarbeiterFromFiliale(fid).getMid();
 
         //choose Produkte
         int numberOfProdukte = 1 + getRandomNumber(14);         //note: Produkteanzahl can't be 0
@@ -164,8 +180,28 @@ public class WinDBoe extends DataGenerator {
         }
     }
 
+    public void generateMitarbeiter() throws URISyntaxException, IOException {
+        int mid = super.getHighestID("SELECT mid FROM mitarbeiter", "mid")+1;
+        Name name = super.generateRandomName();
+        Date geburtsdatum = super.generateRandomDate(1970, 2000);
+        Double bg = super.generateRandomDecimal(2450, 3560);
+        Enum taetigkeit = Taetigkeit.values()[getRandomNumber(Taetigkeit.values().length)];
+        int fid = super.getRandomNumber(super.getHighestID("SELECT fid FROM Filiale", "fid"));
+        //int maid = super.getRandomNumber(super.getHighestID("SELECT maid FROM Mitarbeiterausweis", "maid")+1);
+        Adresse adresse = super.getRandomAdress();
 
-    public void generateMitarbeiter(){
+        //look if there are available employees for being vorgesetzter
+        int vorgesID;
+        try{
+            vorgesID = getRandomMitarbeiterFromFiliale(fid).getMid();
+        }
+        catch (IndexOutOfBoundsException e){
+            vorgesID = 0;
+        }
 
+        Mitarbeiter mitarbeiter = new Mitarbeiter(mid, name.getVorname(), name.getNachname(), geburtsdatum, adresse.getStrasse(), adresse.getPlz(), adresse.getOrt(), bg, taetigkeit, fid, vorgesID, 1);
+        System.out.println(mitarbeiter.getMid() +  mitarbeiter.getVorname() + mitarbeiter.getNachname() + mitarbeiter.getGeburtsdatum() + mitarbeiter.getOrt() + mitarbeiter.getBg() + mitarbeiter.getTaetigkeit() + mitarbeiter.getFid() + mitarbeiter.getVorgesid());
+
+        //TODO : if vorgesID = 0, make it NULL in database
     }
 }
