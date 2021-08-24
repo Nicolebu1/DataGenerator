@@ -22,16 +22,6 @@ public class Adresse extends DataGenerator {
         getAdresses();
     }
 
-    /*
-    public Adresse(String strasse, Integer plz, String ort, BigDecimal laengengrad, BigDecimal breitengrad) {
-        getAdresses();
-        this.strasse = strasse;
-        this.plz = plz;
-        this.ort = ort;
-        this.laengengrad = laengengrad;
-        this.breitengrad = breitengrad;
-    }
-    */
 
     public void getAdresses() {
         super.createConnection("jdbc:postgresql://localhost:5432/LokiDB");
@@ -52,50 +42,26 @@ public class Adresse extends DataGenerator {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.exit(0);
         }
+        super.closeConnection();
     }
 
-    public String setRandomStrasse() {
-        this.strasse = strassen.get(super.getRandomNumber(strassen.size() - 1));
-        return this.strasse;
+    public String getRandomStrasse() {
+        return strassen.get(super.getRandomNumber(strassen.size() - 1));
     }
 
-    public String getStrasse() {
-        return strasse;
+    public Integer getRandomPlz() {
+        return plzs.get(super.getRandomNumber(plzs.size() - 1));
     }
 
-    public Integer setRandomPlz() {
-        this.plz = plzs.get(super.getRandomNumber(plzs.size() - 1));
-        return this.plz;
+    public String getRandomOrt() {
+        return orte.get(super.getRandomNumber(orte.size() - 1));
     }
 
-    public Integer getPlz() {
-        return plz;
+    public BigDecimal getRandomLaengengrad() {
+        return laengengrade.get(super.getRandomNumber(laengengrade.size() - 1));
     }
 
-    public String setRandomOrt() {
-        this.ort = orte.get(super.getRandomNumber(orte.size() - 1));
-        return this.ort;
-    }
-
-    public String getOrt() {
-        return ort;
-    }
-
-    public BigDecimal setRandomLaengengrad() {
-        this.laengengrad = laengengrade.get(super.getRandomNumber(laengengrade.size() - 1));
-        return this.laengengrad;
-    }
-
-    public BigDecimal getLaengengrad() {
-        return laengengrad;
-    }
-
-    public BigDecimal setRandomBreitengrad() {
-        this.breitengrad = breitengrade.get(super.getRandomNumber(breitengrade.size() - 1));
-        return this.breitengrad;
-    }
-
-    public BigDecimal getBreitengrad() {
-        return breitengrad;
+    public BigDecimal getRandomBreitengrad() {
+        return breitengrade.get(super.getRandomNumber(breitengrade.size() - 1));
     }
 }

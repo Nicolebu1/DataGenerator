@@ -1,16 +1,15 @@
 package WinDBoe;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
-import static WinDBoe.Taetigkeit.Bäcker;
 import static java.sql.Types.NULL;
 
 import Main.Adresse;
 import Main.DataGenerator;
-import Main.Name;
 
 public class WinDBoe extends DataGenerator {
 
@@ -18,18 +17,34 @@ public class WinDBoe extends DataGenerator {
     ArrayList<Produkt> Produkte = new ArrayList<>();
     ArrayList<Verkauf> Verkäufe = new ArrayList<>();
     ArrayList<Mitarbeiter> Mitarbeiter = new ArrayList<>();
+    Adresse adress;
 
     public static void main(String[] args) throws URISyntaxException, IOException {
+
         WinDBoe winDBoe = new WinDBoe();
     }
 
     public WinDBoe() throws URISyntaxException, IOException {
+        this.adress = new Adresse();
         super.createConnection("jdbc:postgresql://localhost:5432/WinDBoe");
         getFilialen();
         getMitarbeiter();
         getProdukte();
         generateMitarbeiter();
-        super.closeConnection();
+    }
+
+
+    //send queries to database
+    public void sendToDatabase(String sql) {
+        try {
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            DataGenerator.stmt.execute(sql);
+            System.out.println(sql);
+            System.out.println("Inserted.");
+        } catch (
+                Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 
@@ -92,11 +107,11 @@ public class WinDBoe extends DataGenerator {
         }
     }
 
-    public Filiale getRandomFiliale(){
+    public Filiale getRandomFiliale() {
         return Filialen.get(getRandomNumber(Filialen.size() - 1));
     }
 
-    public Mitarbeiter getRandomMitarbeiterFromFiliale(int fid){
+    public Mitarbeiter getRandomMitarbeiterFromFiliale(int fid) {
 
         //select all Mitarbeiter from choosen Filiale
         ArrayList<Mitarbeiter> FilialenMitarbeiter = new ArrayList<>();
@@ -117,6 +132,9 @@ public class WinDBoe extends DataGenerator {
         //choose Filiale
         Filiale filiale = getRandomFiliale();
         int fid = filiale.getFid();
+
+        //choose Verkaufsdatum
+        Date verkaufsdatum = super.generateRandomDate(2021, 2021);
 
         //choose Random Mitarbeiter from Filiale
         int mid = getRandomMitarbeiterFromFiliale(fid).getMid();
@@ -148,60 +166,79 @@ public class WinDBoe extends DataGenerator {
         //round to 2 decimal places
         verkaufspreis = Math.round(verkaufspreis * 100.0) / 100.0;
 
-        //now finally create Verkauf
-        //TODO: Parameter anpassen, wenn gewünscht!
-        if (mid != -1) {
-            Verkauf v = new Verkauf(vid, super.generateRandomDate(2021, 2021), verkaufspreis, fid, mid);
-        }
+        //create statements
+        String sql = "INSERT INTO verkauf (vid, verkaufsdatum, rechnungsbetrag, fid, mid) " +
+                "VALUES (" + vid + ", '" + verkaufsdatum + "', " + verkaufspreis + " ," + fid + " ," + mid + ");";
 
         //insert into Database
-        try {
-            DataGenerator.stmt = DataGenerator.c.createStatement();
+        sendToDatabase(sql);
 
-            //insert into Verkauf
-            String sql = "INSERT INTO verkauf (vid, verkaufsdatum, rechnungsbetrag, fid, mid) " + "VALUES (" + vid + ", '" + super.generateRandomDate(2021, 2021) + "', " + verkaufspreis + " ," + fid + " ," + mid + ");";
-            DataGenerator.stmt.execute(sql);
-            System.out.println(sql);
-            System.out.println("Inserted.");
-
-            //insert into Verkaufsposition
-            verkaufsposition.forEach((key, value) -> {
-                String sql2 = "INSERT INTO verkaufsposition (menge, vid, pid) " + "VALUES (" + value + ", " + vid + ", " + key + ");";
-                try {
-                    DataGenerator.stmt.execute(sql2);
-                    System.out.println(sql2);
-                    System.out.println("Inserted");
-                } catch (SQLException e) {
-                    System.out.println(e.getMessage());
-                }
-            });
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        //insert into Verkaufsposition
+        verkaufsposition.forEach((key, value) -> {
+            String sql2 = "INSERT INTO verkaufsposition (menge, vid, pid) " +
+                    "VALUES (" + value + ", " + vid + ", " + key + ");";
+            sendToDatabase(sql2);
+        });
     }
 
-    public void generateMitarbeiter() throws URISyntaxException, IOException {
-        int mid = super.getHighestID("SELECT mid FROM mitarbeiter", "mid")+1;
-        Name name = super.generateRandomName();
-        Date geburtsdatum = super.generateRandomDate(1970, 2000);
-        Double bg = super.generateRandomDecimal(2450, 3560);
-        Enum taetigkeit = Taetigkeit.values()[getRandomNumber(Taetigkeit.values().length)];
-        int fid = super.getRandomNumber(super.getHighestID("SELECT fid FROM Filiale", "fid"));
-        //int maid = super.getRandomNumber(super.getHighestID("SELECT maid FROM Mitarbeiterausweis", "maid")+1);
-        Adresse adresse = super.getRandomAdress();
 
-        //look if there are available employees for being vorgesetzter
+    public void generateMitarbeiter() throws URISyntaxException, IOException {
+
+        //define mid
+        int mid = super.getHighestID("SELECT mid FROM mitarbeiter", "mid") + 1;
+
+        //set personal data
+        String vorname = super.generateRandomVorname();
+        String nachname = super.generateRandomNachname();
+        Date geburtsdatum = super.generateRandomDate(1970, 2000);
+
+        //set Filiale
+        Filiale filiale = getRandomFiliale();
+        int fid = filiale.getFid();
+
+        //set Adresse
+        String strasse = adress.getRandomStrasse();
+        int plz = filiale.getPlz();                 //to make sure mitarbeiter lives near his filiale
+        String ort = adress.getRandomOrt();
+
+        //set specific data
+        double bg = super.generateRandomDecimal(2100, 3750);
+        Enum taetigkeit = Taetigkeit.values()[getRandomNumber(Taetigkeit.values().length)];
+
+        //generate Mitarbeiterausweis
+        int maid = generateMitarbeiterausweis(mid);
+
+        //look if there are available mitarbeiter for being vorgesetzter
         int vorgesID;
-        try{
+        try {
             vorgesID = getRandomMitarbeiterFromFiliale(fid).getMid();
-        }
-        catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             vorgesID = 0;
         }
 
-        Mitarbeiter mitarbeiter = new Mitarbeiter(mid, name.getVorname(), name.getNachname(), geburtsdatum, adresse.getStrasse(), adresse.getPlz(), adresse.getOrt(), bg, taetigkeit, fid, vorgesID, 1);
-        System.out.println(mitarbeiter.getMid() +  mitarbeiter.getVorname() + mitarbeiter.getNachname() + mitarbeiter.getGeburtsdatum() + mitarbeiter.getOrt() + mitarbeiter.getBg() + mitarbeiter.getTaetigkeit() + mitarbeiter.getFid() + mitarbeiter.getVorgesid());
+        String sql;
 
-        //TODO : if vorgesID = 0, make it NULL in database
+        if (vorgesID == 0) {
+            sql = "INSERT INTO mitarbeiter (mid, vorname, nachname, strasse, plz, ort, bg, taetigkeit, fid, vorgesid, geburtsdatum, maid) " +
+                    "VALUES (" + mid + ", " + vorname + ", " + nachname + ", " + strasse + ", " + plz + ", " + ort + ", " + bg + ", " + taetigkeit + ", " + fid + ", " + NULL + ", " + geburtsdatum + ", " + maid + ");";
+        } else {
+            sql = "INSERT INTO mitarbeiter (mid, vorname, nachname, strasse, plz, ort, bg, taetigkeit, fid, vorgesid, geburtsdatum, maid) " +
+                    "VALUES (" + mid + ", " + vorname + ", " + nachname + ", " + strasse + ", " + plz + ", " + ort + ", " + bg + ", " + taetigkeit + ", " + fid + ", " + vorgesID + ", " + geburtsdatum + ", " + maid + ");";
+        }
+
+        //insert into Database
+        sendToDatabase(sql);
+    }
+
+    public int generateMitarbeiterausweis(int mid) {
+        int maid = 1000 + mid;
+        String berechtigungen = "Stufe: " + super.getRandomNumber(5);
+        Date gueltigBis = super.generateRandomDate(2021, 2023);
+
+        String sql = "INSERT INTO mitarbeiterausweis (maid, berechtigungen, gueltigBis) " +
+                "VALUES (" + maid + ", " + berechtigungen + ", " + gueltigBis + ");";
+
+        sendToDatabase(sql);
+        return maid;
     }
 }

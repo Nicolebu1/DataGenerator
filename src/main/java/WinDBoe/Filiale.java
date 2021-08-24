@@ -20,4 +20,8 @@ public class Filiale{
     public int getFid() {
         return fid;
     }
+
+    public int getPlz() {
+        return plz;
+    }
 }

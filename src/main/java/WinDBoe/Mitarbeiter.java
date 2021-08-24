@@ -90,5 +90,5 @@ public class Mitarbeiter {
 }
 
 enum Taetigkeit{
-    Konditor, Bäcker, Verkauf, Personalmanagement,
+    Konditor, Bäcker, Verkauf, Personalmanagement, Sales_Management
 }

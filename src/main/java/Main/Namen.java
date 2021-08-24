@@ -12,11 +12,6 @@ public class Namen {
     List <String> VornamenW;
     List <String> VornamenM;
 
-    //Todo: Liste mit genderneutralen Namen fehlt noch!
-    public static void main(String[] args) throws URISyntaxException, IOException {
-        Namen name = new Namen();
-    }
-
     public Namen() throws URISyntaxException, IOException {
         readNames();
     }

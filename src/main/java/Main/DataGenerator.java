@@ -9,7 +9,6 @@ public class DataGenerator {
     public static Connection c = null;
     public static Statement stmt = null;
 
-
     public void createConnection(String url) {
         try {
             Class.forName("org.postgresql.Driver");
@@ -83,52 +82,35 @@ public class DataGenerator {
     }
 
 
-    public Adresse getRandomAdress() {
-        Adresse newAdress = new Adresse();
-        newAdress.setRandomStrasse();
-        newAdress.setRandomOrt();
-        newAdress.setRandomPlz();
-        newAdress.setRandomLaengengrad();
-        newAdress.setRandomBreitengrad();
-        return newAdress;
+    public String generateRandomNachname() throws URISyntaxException, IOException {
+        Namen namen = new Namen();
+        return namen.getNachnamen().get(getRandomNumber(namen.getNachnamen().size() - 1));
     }
 
 
-    public Name generateRandomName(char g) throws URISyntaxException, IOException {
+    //Todo: Option for non-Binary names!
+    public String generateRandomVorname(char g) throws URISyntaxException, IOException {
         Namen namen = new Namen();
-
-        String vorname = null;
-        String nachname;
 
         if (g == 'f' || g == 'F' || g == 'w' || g == 'W') {
-            vorname = namen.getVornamenW().get(getRandomNumber(namen.getVornamenW().size() - 1));
+            return namen.getVornamenW().get(getRandomNumber(namen.getVornamenW().size() - 1));
         } else if (g == 'm' || g == 'M') {
-            vorname = namen.getVornamenM().get(getRandomNumber(namen.getVornamenM().size() - 1));
+            return namen.getVornamenM().get(getRandomNumber(namen.getVornamenM().size() - 1));
         }
-        nachname = namen.getNachnamen().get(getRandomNumber(namen.getNachnamen().size() - 1));
-
-        return new Name(vorname, nachname);
+        return null;
     }
 
-
-    public Name generateRandomName() throws URISyntaxException, IOException {
+    public String generateRandomVorname() throws URISyntaxException, IOException {
         Namen namen = new Namen();
 
-        String vorname = null;
-        String nachname;
-
+        //decide sex
         int g = getRandomNumber(1);
 
-        //Todo: Option für Nicht Binäre Namen!
-
         if (g == 0) {
-            vorname = namen.getVornamenW().get(getRandomNumber(namen.getVornamenW().size() - 1));
+            return namen.getVornamenW().get(getRandomNumber(namen.getVornamenW().size() - 1));
         } else {
-            vorname = namen.getVornamenM().get(getRandomNumber(namen.getVornamenM().size() - 1));
+            return namen.getVornamenM().get(getRandomNumber(namen.getVornamenM().size() - 1));
         }
-        nachname = namen.getNachnamen().get(getRandomNumber(namen.getNachnamen().size() - 1));
-
-        return new Name(vorname, nachname);
     }
 }
 
