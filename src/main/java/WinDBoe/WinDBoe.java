@@ -20,7 +20,6 @@ public class WinDBoe extends DataGenerator {
     Adresse adress;
 
     public static void main(String[] args) throws URISyntaxException, IOException {
-
         WinDBoe winDBoe = new WinDBoe();
     }
 
@@ -70,11 +69,12 @@ public class WinDBoe extends DataGenerator {
     public void getFilialen() {
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
-            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT fid FROM filiale;");
+            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT fid, plz FROM filiale;");
             int i = 0;
             while (rs.next()) {
                 int fid = rs.getInt("fid");
-                Filialen.add(new Filiale(fid));
+                int plz = rs.getInt("plz");
+                Filialen.add(new Filiale(fid, plz));
                 i++;
             }
             rs.close();
