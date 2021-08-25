@@ -112,6 +112,20 @@ public class DataGenerator {
             return namen.getVornamenM().get(getRandomNumber(namen.getVornamenM().size() - 1));
         }
     }
+
+    public String generateEmail(String vorname, String nachname){
+        return vorname+'.'+nachname+"@email.db";
+    }
+
+    public String generateEmail(String vorname, String nachname, String endung){
+        return vorname+'.'+nachname+"@" + endung + ".db";
+    }
+
+    public String generateTelNr(){
+        String[] vorwahl = {"0699", "0681", "0650", "0660"};
+        int number = 10000000 + getRandomNumber(999999);
+        return vorwahl[getRandomNumber(vorwahl.length-1)] + number;
+    }
 }
 
 

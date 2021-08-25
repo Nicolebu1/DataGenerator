@@ -18,6 +18,7 @@ public class WinDBoe extends DataGenerator {
     ArrayList<Verkauf> Verkäufe = new ArrayList<>();
     ArrayList<Mitarbeiter> Mitarbeiter = new ArrayList<>();
     Adresse adress;
+    Random random = new Random();
 
     public static void main(String[] args) throws URISyntaxException, IOException {
         WinDBoe winDBoe = new WinDBoe();
@@ -29,7 +30,7 @@ public class WinDBoe extends DataGenerator {
         getFilialen();
         getMitarbeiter();
         getProdukte();
-        generateMitarbeiter();
+        generateKunde();
     }
 
 
@@ -219,11 +220,9 @@ public class WinDBoe extends DataGenerator {
         String sql;
 
         if (vorgesID == 0) {
-            sql = "INSERT INTO mitarbeiter (mid, vorname, nachname, strasse, plz, ort, bg, taetigkeit, fid, vorgesid, geburtsdatum, maid) " +
-                    "VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", " + NULL + ", '" + geburtsdatum + "', " + maid + ");";
+            sql = "INSERT INTO mitarbeiter VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", " + NULL + ", '" + geburtsdatum + "', " + maid + ");";
         } else {
-            sql = "INSERT INTO mitarbeiter (mid, vorname, nachname, strasse, plz, ort, bg, taetigkeit, fid, vorgesid, geburtsdatum, maid) " +
-                    "VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", " + vorgesID + ", '" + geburtsdatum + "', " + maid + ");";
+            sql = "INSERT INTO mitarbeiter VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", " + vorgesID + ", '" + geburtsdatum + "', " + maid + ");";
         }
 
         //insert into Database
@@ -236,10 +235,34 @@ public class WinDBoe extends DataGenerator {
         Date gueltigBis = super.generateRandomDate(2021, 2023);
 
 
-        String sql = "INSERT INTO mitarbeiterausweis (maid, berechtigungen, gueltigbis) " +
+        String sql = "INSERT INTO mitarbeiterausweis " +
                 "VALUES (" + maid + ", '" + berechtigungen + "', '" + gueltigBis + "');";
 
         sendToDatabase(sql);
         return maid;
+    }
+
+
+    public void generateKunde() throws URISyntaxException, IOException {
+
+        //define kundennummer
+        int kdid = super.getHighestID("SELECT kdid FROM kunde", "kdid") + 1;
+
+        //set personal data
+        String vorname = super.generateRandomVorname();
+        String nachname = super.generateRandomNachname();
+        Date geburtsdatum = super.generateRandomDate(1950, 2000);
+        String email = super.generateEmail(vorname, nachname);
+        String telnr = super.generateTelNr();
+        Boolean newsletter = random.nextBoolean();
+
+        //set Adresse
+        String strasse = adress.getRandomStrasse();
+        int plz = adress.getRandomPlz();
+        String ort = adress.getRandomOrt();
+
+        String sql = "INSERT INTO kunde VALUES (" + kdid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', '" + geburtsdatum + "', '" + email + "', '" + telnr + "', " + newsletter + ");";
+
+        sendToDatabase(sql);
     }
 }
