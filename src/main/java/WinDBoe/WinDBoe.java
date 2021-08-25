@@ -30,7 +30,7 @@ public class WinDBoe extends DataGenerator {
         getFilialen();
         getMitarbeiter();
         getProdukte();
-        generateFiliale();
+        generateVerbindlichkeit();
     }
 
 
@@ -296,6 +296,26 @@ public class WinDBoe extends DataGenerator {
         String ort = adress.getRandomOrt();
 
         String sql = "INSERT INTO filiale VALUES (" +  fid + ", '" + strasse + "', " + plz + ", '" + ort + "');";
+
+        sendToDatabase(sql);
+    }
+
+    public void generateVerbindlichkeit() throws URISyntaxException, IOException {
+        int rechnungsnummer = super.getHighestID("SELECT rechnungsnummer FROM verbindlichkeit", "rechnungsnummer") + 1;
+
+        //set cooperate form
+        String[] cooperateform = {"OG", "KG", "Co. KG", "AG"};
+
+        String lieferantenname = super.generateRandomNachname() + " " + cooperateform[super.getRandomNumber(cooperateform.length-1)];
+        double rechnungsbetrag = super.generateRandomDecimal(100, 15000);
+        Date rechnungsdatum = super.generateRandomDate(2021, 2022);
+
+        //Todo: Min Max Datum definition in DataGenerator Class
+        //Date zahlungsdatum = super.generateRandomDate(rechnungsdatum,);
+
+        int fid = getRandomFiliale().getFid();
+
+        String sql = "INSERT INTO verbindlichkeit (rechnungsnummer, lieferantenname, rechnungsbetrag, rechnungsdatum, fid) VALUES (" + rechnungsnummer + ", '" + lieferantenname + "', " + rechnungsbetrag + ", '" + rechnungsdatum + "', " + fid + ");";
 
         sendToDatabase(sql);
     }
