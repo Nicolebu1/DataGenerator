@@ -35,10 +35,10 @@ public class WinDBoe extends DataGenerator {
 
     //send queries to database
     public void sendToDatabase(String sql) {
+        System.out.println(sql);
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
             DataGenerator.stmt.execute(sql);
-            System.out.println(sql);
             System.out.println("Inserted.");
         } catch (
                 Exception e) {
@@ -220,10 +220,10 @@ public class WinDBoe extends DataGenerator {
 
         if (vorgesID == 0) {
             sql = "INSERT INTO mitarbeiter (mid, vorname, nachname, strasse, plz, ort, bg, taetigkeit, fid, vorgesid, geburtsdatum, maid) " +
-                    "VALUES (" + mid + ", " + vorname + ", " + nachname + ", " + strasse + ", " + plz + ", " + ort + ", " + bg + ", " + taetigkeit + ", " + fid + ", " + NULL + ", " + geburtsdatum + ", " + maid + ");";
+                    "VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", " + NULL + ", '" + geburtsdatum + "', " + maid + ");";
         } else {
             sql = "INSERT INTO mitarbeiter (mid, vorname, nachname, strasse, plz, ort, bg, taetigkeit, fid, vorgesid, geburtsdatum, maid) " +
-                    "VALUES (" + mid + ", " + vorname + ", " + nachname + ", " + strasse + ", " + plz + ", " + ort + ", " + bg + ", " + taetigkeit + ", " + fid + ", " + vorgesID + ", " + geburtsdatum + ", " + maid + ");";
+                    "VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", " + vorgesID + ", '" + geburtsdatum + "', " + maid + ");";
         }
 
         //insert into Database
@@ -235,8 +235,9 @@ public class WinDBoe extends DataGenerator {
         String berechtigungen = "Stufe: " + super.getRandomNumber(5);
         Date gueltigBis = super.generateRandomDate(2021, 2023);
 
-        String sql = "INSERT INTO mitarbeiterausweis (maid, berechtigungen, gueltigBis) " +
-                "VALUES (" + maid + ", " + berechtigungen + ", " + gueltigBis + ");";
+
+        String sql = "INSERT INTO mitarbeiterausweis (maid, berechtigungen, gueltigbis) " +
+                "VALUES (" + maid + ", '" + berechtigungen + "', '" + gueltigBis + "');";
 
         sendToDatabase(sql);
         return maid;
