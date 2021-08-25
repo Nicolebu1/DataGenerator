@@ -30,7 +30,7 @@ public class WinDBoe extends DataGenerator {
         getFilialen();
         getMitarbeiter();
         getProdukte();
-        generateKunde();
+        generateFiliale();
     }
 
 
@@ -220,7 +220,7 @@ public class WinDBoe extends DataGenerator {
         String sql;
 
         if (vorgesID == 0) {
-            sql = "INSERT INTO mitarbeiter VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", " + NULL + ", '" + geburtsdatum + "', " + maid + ");";
+            sql = "INSERT INTO mitarbeiter (mid, vorname, nachname, strasse, plz, ort, bg, taetigkeit, fid, geburtsdatum, maid VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", '" + geburtsdatum + "', " + maid + ");";
         } else {
             sql = "INSERT INTO mitarbeiter VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", " + vorgesID + ", '" + geburtsdatum + "', " + maid + ");";
         }
@@ -262,6 +262,40 @@ public class WinDBoe extends DataGenerator {
         String ort = adress.getRandomOrt();
 
         String sql = "INSERT INTO kunde VALUES (" + kdid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', '" + geburtsdatum + "', '" + email + "', '" + telnr + "', " + newsletter + ");";
+
+        sendToDatabase(sql);
+    }
+
+    public void generateFirmenhandy(){
+        int fhid = super.getHighestID("SELECT fhid FROM firmenhandy", "fhid") + 1;
+        String number = super.generateTelNr();
+        int mid = NULL;
+        String sql;
+
+        boolean assigned = false;
+                //random.nextBoolean();
+
+        //Todo: Assigned to mitarbeiter
+        if (assigned == true){
+            mid = getRandomNumber(Mitarbeiter.size()-1);
+            String test = "SELECT mid from firmenhandy";
+
+            sql = "INSERT INTO firmenhandy VALUES ("+ fhid + ", '" + number + "', " + mid + ");";
+        }
+        else{
+            sql = "INSERT INTO firmenhandy (fhid, telnr) VALUES (" + fhid + ", '" + number + "');";
+        }
+
+        sendToDatabase(sql);
+    }
+
+    public void generateFiliale(){
+        int fid = super.getHighestID("SELECT fid FROM filiale", "fid") + 1;
+        String strasse = adress.getRandomStrasse();
+        int plz = adress.getRandomPlz();
+        String ort = adress.getRandomOrt();
+
+        String sql = "INSERT INTO filiale VALUES (" +  fid + ", '" + strasse + "', " + plz + ", '" + ort + "');";
 
         sendToDatabase(sql);
     }

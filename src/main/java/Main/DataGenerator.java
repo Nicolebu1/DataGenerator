@@ -122,9 +122,11 @@ public class DataGenerator {
     }
 
     public String generateTelNr(){
-        String[] vorwahl = {"0699", "0681", "0650", "0660"};
-        int number = 10000000 + getRandomNumber(999999);
-        return vorwahl[getRandomNumber(vorwahl.length-1)] + number;
+        int number = 10 + getRandomNumber(89);
+        int number1 = 100 + getRandomNumber(899);
+        int number2 = 10 + getRandomNumber(89);
+        int number3 = 10 + getRandomNumber(89);
+        return "06" + number + " " + number1 + " " + number2 + " " + number3;
     }
 }
 
