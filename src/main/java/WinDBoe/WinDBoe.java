@@ -15,8 +15,9 @@ public class WinDBoe extends DataGenerator {
 
     ArrayList<Filiale> Filialen = new ArrayList<>();
     ArrayList<Produkt> Produkte = new ArrayList<>();
-    ArrayList<Verkauf> Verkäufe = new ArrayList<>();
     ArrayList<Mitarbeiter> Mitarbeiter = new ArrayList<>();
+    ArrayList<Integer> fhmids = new ArrayList<Integer>();
+
     Adresse adress;
     Random random = new Random();
 
@@ -30,7 +31,8 @@ public class WinDBoe extends DataGenerator {
         getFilialen();
         getMitarbeiter();
         getProdukte();
-        generateVerbindlichkeit();
+        getFirmenhandys();
+        generateFirmenhandy();
     }
 
 
@@ -53,7 +55,6 @@ public class WinDBoe extends DataGenerator {
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
             ResultSet rs = DataGenerator.stmt.executeQuery("SELECT pid, verkaufspreis FROM produkt;");
-            int i = 0;
             while (rs.next()) {
                 int pid = rs.getInt("pid");
                 double preis = rs.getDouble("verkaufspreis");
@@ -71,12 +72,28 @@ public class WinDBoe extends DataGenerator {
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
             ResultSet rs = DataGenerator.stmt.executeQuery("SELECT fid, plz FROM filiale;");
-            int i = 0;
             while (rs.next()) {
                 int fid = rs.getInt("fid");
                 int plz = rs.getInt("plz");
                 Filialen.add(new Filiale(fid, plz));
-                i++;
+            }
+            rs.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+    }
+
+
+    public void getFirmenhandys() {
+        try {
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT mid FROM firmenhandy;");
+            while (rs.next()) {
+                int mid = rs.getInt("mid");
+                if (mid != 0) {
+                    fhmids.add(Integer.valueOf(mid));
+                }
             }
             rs.close();
         } catch (Exception e) {
@@ -90,7 +107,6 @@ public class WinDBoe extends DataGenerator {
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
             ResultSet rs = DataGenerator.stmt.executeQuery("SELECT mid, fid FROM mitarbeiter;");
-            int i = 0;
             while (rs.next()) {
                 int mid = rs.getInt("mid");
                 int fid = rs.getInt("fid");
@@ -123,6 +139,11 @@ public class WinDBoe extends DataGenerator {
         }
         //choose Mitarbeiter
         return FilialenMitarbeiter.get(getRandomNumber(FilialenMitarbeiter.size() - 1));
+    }
+
+
+    public Mitarbeiter getRandomMitarbeiter() {
+        return Mitarbeiter.get(getRandomNumber(Mitarbeiter.size() - 1));
     }
 
 
@@ -229,6 +250,7 @@ public class WinDBoe extends DataGenerator {
         sendToDatabase(sql);
     }
 
+
     public int generateMitarbeiterausweis(int mid) {
         int maid = 1000 + mid;
         String berechtigungen = "Stufe: " + super.getRandomNumber(5);
@@ -254,7 +276,7 @@ public class WinDBoe extends DataGenerator {
         Date geburtsdatum = super.generateRandomDate(1950, 2000);
         String email = super.generateEmail(vorname, nachname);
         String telnr = super.generateTelNr();
-        Boolean newsletter = random.nextBoolean();
+        boolean newsletter = random.nextBoolean();
 
         //set Adresse
         String strasse = adress.getRandomStrasse();
@@ -266,36 +288,46 @@ public class WinDBoe extends DataGenerator {
         sendToDatabase(sql);
     }
 
-    public void generateFirmenhandy(){
+
+    public void generateFirmenhandy() {
         int fhid = super.getHighestID("SELECT fhid FROM firmenhandy", "fhid") + 1;
         String number = super.generateTelNr();
-        int mid = NULL;
+        boolean assigned = true; //random.nextBoolean();
+        int counter = 0;
+        Integer mid;
         String sql;
 
-        boolean assigned = false;
-                //random.nextBoolean();
 
-        //Todo: Assigned to mitarbeiter
-        if (assigned == true){
-            mid = getRandomNumber(Mitarbeiter.size()-1);
-            String test = "SELECT mid from firmenhandy";
-
-            sql = "INSERT INTO firmenhandy VALUES ("+ fhid + ", '" + number + "', " + mid + ");";
-        }
-        else{
+        //assign to mitarbeiter
+        if (assigned == true) {
+            boolean asngd = false;
+            do {
+                mid = Integer.valueOf(getRandomMitarbeiter().getMid());
+                counter++;
+                if (!fhmids.contains(mid)) {
+                    asngd = true;
+                }
+            }
+            while (counter < 10 && asngd == false);
+            if (counter < 10) {
+                sql = "INSERT INTO firmenhandy VALUES (" + fhid + ", '" + number + "', " + mid + ");";
+            } else {
+                sql = "INSERT INTO firmenhandy (fhid, telnr) VALUES (" + fhid + ", '" + number + "');";
+            }
+        } else {
             sql = "INSERT INTO firmenhandy (fhid, telnr) VALUES (" + fhid + ", '" + number + "');";
         }
 
         sendToDatabase(sql);
     }
 
-    public void generateFiliale(){
+    public void generateFiliale() {
         int fid = super.getHighestID("SELECT fid FROM filiale", "fid") + 1;
         String strasse = adress.getRandomStrasse();
         int plz = adress.getRandomPlz();
         String ort = adress.getRandomOrt();
 
-        String sql = "INSERT INTO filiale VALUES (" +  fid + ", '" + strasse + "', " + plz + ", '" + ort + "');";
+        String sql = "INSERT INTO filiale VALUES (" + fid + ", '" + strasse + "', " + plz + ", '" + ort + "');";
 
         sendToDatabase(sql);
     }
@@ -304,9 +336,9 @@ public class WinDBoe extends DataGenerator {
         int rechnungsnummer = super.getHighestID("SELECT rechnungsnummer FROM verbindlichkeit", "rechnungsnummer") + 1;
 
         //set cooperate form
-        String[] cooperateform = {"OG", "KG", "Co. KG", "AG"};
+        String[] cooperateform = {"OG", "KG", "Co.KG", "AG"};
 
-        String lieferantenname = super.generateRandomNachname() + " " + cooperateform[super.getRandomNumber(cooperateform.length-1)];
+        String lieferantenname = super.generateRandomNachname() + " " + cooperateform[super.getRandomNumber(cooperateform.length - 1)];
         double rechnungsbetrag = super.generateRandomDecimal(100, 15000);
         Date rechnungsdatum = super.generateRandomDate(2021, 2022);
 
