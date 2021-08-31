@@ -11,13 +11,6 @@ public class Filiale{
         this.plz = plz;
     }
 
-    public Filiale(int fid, String strasse, int plz, String ort) {
-        this.fid = fid;
-        this.strasse = strasse;
-        this.plz = plz;
-        this.ort = ort;
-    }
-
     public int getFid() {
         return fid;
     }

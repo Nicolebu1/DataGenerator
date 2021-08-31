@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.*;
 import java.sql.Date;
+import java.text.ParseException;
 import java.util.*;
 
 import static java.sql.Types.NULL;
@@ -21,18 +22,18 @@ public class WinDBoe extends DataGenerator {
     Adresse adress;
     Random random = new Random();
 
-    public static void main(String[] args) throws URISyntaxException, IOException {
+    public static void main(String[] args) throws URISyntaxException, IOException, ParseException {
         WinDBoe winDBoe = new WinDBoe();
     }
 
-    public WinDBoe() throws URISyntaxException, IOException {
+
+    public WinDBoe() throws URISyntaxException, IOException, ParseException {
         this.adress = new Adresse();
         super.createConnection("jdbc:postgresql://localhost:5432/WinDBoe");
         getFilialen();
         getMitarbeiter();
         getProdukte();
         getFirmenhandys();
-        generateFirmenhandy();
     }
 
 
@@ -50,7 +51,8 @@ public class WinDBoe extends DataGenerator {
     }
 
 
-    //get data from database
+    //--------------Get data from Database-----------------------
+
     public void getProdukte() {
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
@@ -124,9 +126,11 @@ public class WinDBoe extends DataGenerator {
         }
     }
 
+
     public Filiale getRandomFiliale() {
         return Filialen.get(getRandomNumber(Filialen.size() - 1));
     }
+
 
     public Mitarbeiter getRandomMitarbeiterFromFiliale(int fid) {
 
@@ -147,7 +151,8 @@ public class WinDBoe extends DataGenerator {
     }
 
 
-    //insert data in database
+    //--------------Generate random Data-----------------------
+
     public void generateVerkauf() {
         int vid = super.getHighestID("SELECT * FROM verkauf;", "vid") + 1;
 
@@ -246,7 +251,6 @@ public class WinDBoe extends DataGenerator {
             sql = "INSERT INTO mitarbeiter VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", " + vorgesID + ", '" + geburtsdatum + "', " + maid + ");";
         }
 
-        //insert into Database
         sendToDatabase(sql);
     }
 
@@ -292,11 +296,10 @@ public class WinDBoe extends DataGenerator {
     public void generateFirmenhandy() {
         int fhid = super.getHighestID("SELECT fhid FROM firmenhandy", "fhid") + 1;
         String number = super.generateTelNr();
-        boolean assigned = true; //random.nextBoolean();
+        boolean assigned = random.nextBoolean();
         int counter = 0;
         Integer mid;
         String sql;
-
 
         //assign to mitarbeiter
         if (assigned == true) {
@@ -317,22 +320,21 @@ public class WinDBoe extends DataGenerator {
         } else {
             sql = "INSERT INTO firmenhandy (fhid, telnr) VALUES (" + fhid + ", '" + number + "');";
         }
-
         sendToDatabase(sql);
     }
+
 
     public void generateFiliale() {
         int fid = super.getHighestID("SELECT fid FROM filiale", "fid") + 1;
         String strasse = adress.getRandomStrasse();
         int plz = adress.getRandomPlz();
         String ort = adress.getRandomOrt();
-
         String sql = "INSERT INTO filiale VALUES (" + fid + ", '" + strasse + "', " + plz + ", '" + ort + "');";
-
         sendToDatabase(sql);
     }
 
-    public void generateVerbindlichkeit() throws URISyntaxException, IOException {
+
+    public void generateVerbindlichkeit() throws URISyntaxException, IOException, ParseException {
         int rechnungsnummer = super.getHighestID("SELECT rechnungsnummer FROM verbindlichkeit", "rechnungsnummer") + 1;
 
         //set cooperate form
@@ -342,13 +344,21 @@ public class WinDBoe extends DataGenerator {
         double rechnungsbetrag = super.generateRandomDecimal(100, 15000);
         Date rechnungsdatum = super.generateRandomDate(2021, 2022);
 
-        //Todo: Min Max Datum definition in DataGenerator Class
-        //Date zahlungsdatum = super.generateRandomDate(rechnungsdatum,);
+        Date zahlungsdatum = generateFollowUpDate(rechnungsdatum);
+        System.out.println("Zahldatum ist: " + rechnungsdatum +", " + zahlungsdatum);
 
         int fid = getRandomFiliale().getFid();
 
-        String sql = "INSERT INTO verbindlichkeit (rechnungsnummer, lieferantenname, rechnungsbetrag, rechnungsdatum, fid) VALUES (" + rechnungsnummer + ", '" + lieferantenname + "', " + rechnungsbetrag + ", '" + rechnungsdatum + "', " + fid + ");";
+        boolean paid = random.nextBoolean();
 
+        String sql = null;
+
+        if(paid == true) {
+            sql = "INSERT INTO verbindlichkeit (rechnungsnummer, lieferantenname, rechnungsbetrag, rechnungsdatum, zahlungsdatum, fid) VALUES (" + rechnungsnummer + ", '" + lieferantenname + "', " + rechnungsbetrag + ", '" + rechnungsdatum + "', '" + zahlungsdatum + "', " + fid + ");";
+        }
+        else {
+            sql = "INSERT INTO verbindlichkeit (rechnungsnummer, lieferantenname, rechnungsbetrag, rechnungsdatum, fid) VALUES (" + rechnungsnummer + ", '" + lieferantenname + "', " + rechnungsbetrag + ", '" + rechnungsdatum + "', " + fid + ");";
+        }
         sendToDatabase(sql);
     }
 }

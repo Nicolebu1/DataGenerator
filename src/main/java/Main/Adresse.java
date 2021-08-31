@@ -12,12 +12,6 @@ public class Adresse extends DataGenerator {
     ArrayList<BigDecimal> laengengrade = new ArrayList<>();
     ArrayList<BigDecimal> breitengrade = new ArrayList<>();
 
-    String strasse;
-    Integer plz;
-    String ort;
-    BigDecimal laengengrad;
-    BigDecimal breitengrad;
-
     public Adresse() {
         getAdresses();
     }
@@ -45,21 +39,26 @@ public class Adresse extends DataGenerator {
         super.closeConnection();
     }
 
+
     public String getRandomStrasse() {
         return strassen.get(super.getRandomNumber(strassen.size() - 1));
     }
+
 
     public Integer getRandomPlz() {
         return plzs.get(super.getRandomNumber(plzs.size() - 1));
     }
 
+
     public String getRandomOrt() {
         return orte.get(super.getRandomNumber(orte.size() - 1));
     }
 
+
     public BigDecimal getRandomLaengengrad() {
         return laengengrade.get(super.getRandomNumber(laengengrade.size() - 1));
     }
+
 
     public BigDecimal getRandomBreitengrad() {
         return breitengrade.get(super.getRandomNumber(breitengrade.size() - 1));

@@ -3,6 +3,10 @@ package Main;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 
 public class DataGenerator {
 
@@ -65,10 +69,20 @@ public class DataGenerator {
     public Date generateRandomDate(int min, int max) {
         int startYear = min;
         int endYear = max;
-        long start = Timestamp.valueOf(startYear + 1 + "-1-1 0:0:0").getTime();
+        long start = Timestamp.valueOf(startYear + "-1-1 0:0:0").getTime();
         long end = Timestamp.valueOf(endYear + "-1-1 0:0:0").getTime();
         long ms = (long) ((end - start) * Math.random() + start);
         return new Date(ms);
+    }
+
+
+    public Date generateFollowUpDate(Date date1) throws ParseException {
+        {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date1);
+            cal.add(Calendar.DATE, getRandomNumber(31));
+            return new java.sql.Date(cal.getTimeInMillis());
+        }
     }
 
 
@@ -100,6 +114,7 @@ public class DataGenerator {
         return null;
     }
 
+
     public String generateRandomVorname() throws URISyntaxException, IOException {
         Namen namen = new Namen();
 
@@ -113,13 +128,16 @@ public class DataGenerator {
         }
     }
 
+
     public String generateEmail(String vorname, String nachname){
         return vorname+'.'+nachname+"@email.db";
     }
 
+
     public String generateEmail(String vorname, String nachname, String endung){
         return vorname+'.'+nachname+"@" + endung + ".db";
     }
+
 
     public String generateTelNr(){
         int number = 10 + getRandomNumber(89);
