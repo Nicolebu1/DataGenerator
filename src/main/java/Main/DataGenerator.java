@@ -146,6 +146,19 @@ public class DataGenerator {
         int number3 = 10 + getRandomNumber(89);
         return "06" + number + " " + number1 + " " + number2 + " " + number3;
     }
+
+    public char generateRandomSex(){
+
+        //Todo: Implement non-binary options
+
+        if(this.getRandomNumber(1) == 0){
+            return 'f';
+        }
+        else //if (this.getRandomNumber(2) == 1)
+        {
+            return 'm';
+        }
+    }
 }
 
 
