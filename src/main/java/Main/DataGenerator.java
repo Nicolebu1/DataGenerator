@@ -159,6 +159,14 @@ public class DataGenerator {
             return 'm';
         }
     }
+
+    enum Familienstand {
+        ledig, verheiratet, geschieden, verwittwet, in_eingetragener_Partnerschaft, eingetragene_Lebenspartnerschaft_aufgehoben, eingetragener_Lebenspartner_verstorben,
+    }
+
+    public String genererateRandomFamilienstand(){
+        return Familienstand.values()[getRandomNumber(Familienstand.values().length)].toString();
+    }
 }
 
 

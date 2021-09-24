@@ -15,6 +15,12 @@ public class LokiDB extends DataGenerator {
         String nachname = super.generateRandomNachname();
         Date geburtsdatum = super.generateRandomDate(1940, 2001);
         String telefon = super.generateTelNr();
-        String status;
+        String familienstand = super.genererateRandomFamilienstand();
+        String landID = "AUT";
+        int adressenID = super.getRandomNumber(super.getHighestID("SELECT * FROM adresse", "adressenid"));
+    }
+
+    public void generateGeschaedigter(){
+
     }
 }
