@@ -26,4 +26,8 @@ public class Berufe {
             this.Berufe = Files.readAllLines(Berufe.toPath());
         }
     }
+
+    public List<String> getBerufe() {
+        return Berufe;
+    }
 }

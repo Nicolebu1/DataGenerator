@@ -37,20 +37,6 @@ public class WinDBoe extends DataGenerator {
     }
 
 
-    //send queries to database
-    public void sendToDatabase(String sql) {
-        System.out.println(sql);
-        try {
-            DataGenerator.stmt = DataGenerator.c.createStatement();
-            DataGenerator.stmt.execute(sql);
-            System.out.println("Inserted.");
-        } catch (
-                Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-
     //--------------Get data from Database-----------------------
 
     public void getProdukte() {
@@ -198,13 +184,13 @@ public class WinDBoe extends DataGenerator {
                 "VALUES (" + vid + ", '" + verkaufsdatum + "', " + verkaufspreis + " ," + fid + " ," + mid + ");";
 
         //insert into Database
-        sendToDatabase(sql);
+        super.sendToDatabase(sql);
 
         //insert into Verkaufsposition
         verkaufsposition.forEach((key, value) -> {
             String sql2 = "INSERT INTO verkaufsposition (menge, vid, pid) " +
                     "VALUES (" + value + ", " + vid + ", " + key + ");";
-            sendToDatabase(sql2);
+            super.sendToDatabase(sql2);
         });
     }
 
@@ -251,7 +237,7 @@ public class WinDBoe extends DataGenerator {
             sql = "INSERT INTO mitarbeiter VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", " + vorgesID + ", '" + geburtsdatum + "', " + maid + ");";
         }
 
-        sendToDatabase(sql);
+        super.sendToDatabase(sql);
     }
 
 
@@ -264,7 +250,7 @@ public class WinDBoe extends DataGenerator {
         String sql = "INSERT INTO mitarbeiterausweis " +
                 "VALUES (" + maid + ", '" + berechtigungen + "', '" + gueltigBis + "');";
 
-        sendToDatabase(sql);
+        super.sendToDatabase(sql);
         return maid;
     }
 
@@ -289,7 +275,7 @@ public class WinDBoe extends DataGenerator {
 
         String sql = "INSERT INTO kunde VALUES (" + kdid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', '" + geburtsdatum + "', '" + email + "', '" + telnr + "', " + newsletter + ");";
 
-        sendToDatabase(sql);
+        super.sendToDatabase(sql);
     }
 
 
@@ -320,7 +306,7 @@ public class WinDBoe extends DataGenerator {
         } else {
             sql = "INSERT INTO firmenhandy (fhid, telnr) VALUES (" + fhid + ", '" + number + "');";
         }
-        sendToDatabase(sql);
+        super.sendToDatabase(sql);
     }
 
 
@@ -330,7 +316,7 @@ public class WinDBoe extends DataGenerator {
         int plz = adress.getRandomPlz();
         String ort = adress.getRandomOrt();
         String sql = "INSERT INTO filiale VALUES (" + fid + ", '" + strasse + "', " + plz + ", '" + ort + "');";
-        sendToDatabase(sql);
+        super.sendToDatabase(sql);
     }
 
 
@@ -359,6 +345,6 @@ public class WinDBoe extends DataGenerator {
         else {
             sql = "INSERT INTO verbindlichkeit (rechnungsnummer, lieferantenname, rechnungsbetrag, rechnungsdatum, fid) VALUES (" + rechnungsnummer + ", '" + lieferantenname + "', " + rechnungsbetrag + ", '" + rechnungsdatum + "', " + fid + ");";
         }
-        sendToDatabase(sql);
+        super.sendToDatabase(sql);
     }
 }

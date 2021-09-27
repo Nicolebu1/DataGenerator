@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Calendar;
 
 public class DataGenerator {
@@ -35,6 +33,20 @@ public class DataGenerator {
             System.out.println("Connection closed");
         } catch (Exception e) {
 
+        }
+    }
+
+
+    //send queries to database
+    public void sendToDatabase(String sql) {
+        System.out.println(sql);
+        try {
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            DataGenerator.stmt.execute(sql);
+            System.out.println("Inserted.");
+        } catch (
+                Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -93,6 +105,11 @@ public class DataGenerator {
 
     public int getRandomNumber(int max) {
         return (int) (Math.random() * max);
+    }
+
+
+    public int getRandomNumber(int min, int max) {
+        return (int) (min + Math.random() * max);
     }
 
 
@@ -160,13 +177,22 @@ public class DataGenerator {
         }
     }
 
+
     enum Familienstand {
         ledig, verheiratet, geschieden, verwittwet, in_eingetragener_Partnerschaft, eingetragene_Lebenspartnerschaft_aufgehoben, eingetragener_Lebenspartner_verstorben,
     }
 
+
     public String genererateRandomFamilienstand(){
         return Familienstand.values()[getRandomNumber(Familienstand.values().length)].toString();
     }
+
+
+    public String getRandomBeruf() throws URISyntaxException, IOException {
+        Berufe beruf = new Berufe();
+        return beruf.getBerufe().get(getRandomNumber(beruf.getBerufe().size() - 1));
+    }
+
 }
 
 
