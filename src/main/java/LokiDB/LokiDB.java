@@ -1,16 +1,17 @@
 package LokiDB;
 
 import Main.DataGenerator;
-import WinDBoe.Produkt;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.text.ParseException;
+import java.util.ArrayList;
 
 public class LokiDB extends DataGenerator {
 
-    Ermittler[] ermittler;
+    ArrayList<Ermittler> ermittler = new ArrayList<>();
+
 
     public static void main(String[] args) throws URISyntaxException, IOException, ParseException {
         LokiDB lokiDB = new LokiDB();
@@ -20,6 +21,7 @@ public class LokiDB extends DataGenerator {
     public LokiDB() throws URISyntaxException, IOException, ParseException {
         //super.createConnection("jdbc:postgresql://localhost:5432/LokiDB");
     }
+
 
     //------------------------------GET DATA FROM DATABASE-------------------------------------------
 
@@ -31,8 +33,14 @@ public class LokiDB extends DataGenerator {
                 int persid = rs.getInt("persid");
                 String verwgr = rs.getString("verwgr");
                 String dstgr = rs.getString("dstgr");
-                String vorgesid = rs.getString("vorgesid");
-                ermittler.add(new Ermittler());
+                int vorgesid;
+                try {
+                    vorgesid = rs.getInt("vorgesid");
+                    ermittler.add(new Ermittler(persid, verwgr, dstgr, vorgesid));
+                }
+                catch (NullPointerException e){
+                    ermittler.add(new Ermittler(persid, verwgr, dstgr));
+                }
             }
             rs.close();
         } catch (Exception e) {
@@ -40,6 +48,9 @@ public class LokiDB extends DataGenerator {
             System.exit(0);
         }
     }
+
+
+    //------------------------------------GENERATE----------------------------------------
 
 
     public void generatePerson() throws URISyntaxException, IOException, ParseException {
@@ -58,7 +69,8 @@ public class LokiDB extends DataGenerator {
         String beruf = super.getRandomBeruf();
         String blutgruppe = getRandomBlutgruppe();
     }
-    
+
+
     public void generateVerdaechtiger() throws URISyntaxException, IOException, ParseException {
         Person verdaechtiger = new Person();
         int groesse = super.getRandomNumber(130, 210);
@@ -78,7 +90,6 @@ public class LokiDB extends DataGenerator {
     public void generateErmittler() throws URISyntaxException, IOException, ParseException {
 
     }
-
 
 
     // ---------------------------------GENERATE LOKI-SPECIFIC CONTENT--------------------------------------

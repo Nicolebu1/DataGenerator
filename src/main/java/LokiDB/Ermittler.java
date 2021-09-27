@@ -15,19 +15,17 @@ public class Ermittler extends DataGenerator {
     int vorgesID;
     int teamID;
 
-    String[] dienstgrade = {"Inspektor", "Revierinspektor",}
 
-    //define BG and Dstgr
-        switch (verwgr) {
-        case "E2b": dstgr = getRandomDienstgrad(verwgr)
+    public Ermittler(int persid, String verwgr, String dstgr, int vorgesID) throws URISyntaxException, IOException, ParseException {
     }
 
-    public Ermittler() throws URISyntaxException, IOException, ParseException {
-        ermittler = new Person();
-        verwgr = verwendungsgruppe[super.getRandomNumber(0, 2)];
+
+    public Ermittler(int persid, String verwgr, String dstgr) throws URISyntaxException, IOException, ParseException {
     }
+
 
     String generateVerwendungsgruppe(){
         String[] verwendungsgruppe = {"E2b", "E2a", "E1"};
+        return verwendungsgruppe[super.getRandomNumber(2)];
     }
 }
