@@ -41,26 +41,26 @@ public class Adresse extends DataGenerator {
 
 
     public String getRandomStrasse() {
-        return strassen.get(super.getRandomNumber(strassen.size() - 1));
+        return strassen.get(super.generateRandomNumber(strassen.size() - 1));
     }
 
 
     public Integer getRandomPlz() {
-        return plzs.get(super.getRandomNumber(plzs.size() - 1));
+        return plzs.get(super.generateRandomNumber(plzs.size() - 1));
     }
 
 
     public String getRandomOrt() {
-        return orte.get(super.getRandomNumber(orte.size() - 1));
+        return orte.get(super.generateRandomNumber(orte.size() - 1));
     }
 
 
     public BigDecimal getRandomLaengengrad() {
-        return laengengrade.get(super.getRandomNumber(laengengrade.size() - 1));
+        return laengengrade.get(super.generateRandomNumber(laengengrade.size() - 1));
     }
 
 
     public BigDecimal getRandomBreitengrad() {
-        return breitengrade.get(super.getRandomNumber(breitengrade.size() - 1));
+        return breitengrade.get(super.generateRandomNumber(breitengrade.size() - 1));
     }
 }

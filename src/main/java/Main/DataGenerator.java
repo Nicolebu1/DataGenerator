@@ -92,7 +92,7 @@ public class DataGenerator {
         {
             Calendar cal = Calendar.getInstance();
             cal.setTime(date1);
-            cal.add(Calendar.DATE, getRandomNumber(31));
+            cal.add(Calendar.DATE, generateRandomNumber(31));
             return new java.sql.Date(cal.getTimeInMillis());
         }
     }
@@ -103,19 +103,19 @@ public class DataGenerator {
     }
 
 
-    public int getRandomNumber(int max) {
+    public int generateRandomNumber(int max) {
         return (int) (Math.random() * max);
     }
 
 
-    public int getRandomNumber(int min, int max) {
-        return (int) (min + Math.random() * max);
+    public int generateRandomNumber(int min, int max) {
+        return (int) (min + Math.random() * (max - min));
     }
 
 
     public String generateRandomNachname() throws URISyntaxException, IOException {
         Namen namen = new Namen();
-        return namen.getNachnamen().get(getRandomNumber(namen.getNachnamen().size() - 1));
+        return namen.getNachnamen().get(generateRandomNumber(namen.getNachnamen().size() - 1));
     }
 
 
@@ -124,9 +124,9 @@ public class DataGenerator {
         Namen namen = new Namen();
 
         if (g == 'f' || g == 'F' || g == 'w' || g == 'W') {
-            return namen.getVornamenW().get(getRandomNumber(namen.getVornamenW().size() - 1));
+            return namen.getVornamenW().get(generateRandomNumber(namen.getVornamenW().size() - 1));
         } else if (g == 'm' || g == 'M') {
-            return namen.getVornamenM().get(getRandomNumber(namen.getVornamenM().size() - 1));
+            return namen.getVornamenM().get(generateRandomNumber(namen.getVornamenM().size() - 1));
         }
         return null;
     }
@@ -136,12 +136,12 @@ public class DataGenerator {
         Namen namen = new Namen();
 
         //decide sex
-        int g = getRandomNumber(1);
+        int g = generateRandomNumber(1);
 
         if (g == 0) {
-            return namen.getVornamenW().get(getRandomNumber(namen.getVornamenW().size() - 1));
+            return namen.getVornamenW().get(generateRandomNumber(namen.getVornamenW().size() - 1));
         } else {
-            return namen.getVornamenM().get(getRandomNumber(namen.getVornamenM().size() - 1));
+            return namen.getVornamenM().get(generateRandomNumber(namen.getVornamenM().size() - 1));
         }
     }
 
@@ -157,10 +157,10 @@ public class DataGenerator {
 
 
     public String generateTelNr(){
-        int number = 10 + getRandomNumber(89);
-        int number1 = 100 + getRandomNumber(899);
-        int number2 = 10 + getRandomNumber(89);
-        int number3 = 10 + getRandomNumber(89);
+        int number = 10 + generateRandomNumber(89);
+        int number1 = 100 + generateRandomNumber(899);
+        int number2 = 10 + generateRandomNumber(89);
+        int number3 = 10 + generateRandomNumber(89);
         return "06" + number + " " + number1 + " " + number2 + " " + number3;
     }
 
@@ -168,8 +168,8 @@ public class DataGenerator {
 
         //Todo: Implement non-binary options
 
-        if(this.getRandomNumber(1) == 0){
-            return 'f';
+        if(this.generateRandomNumber(1) == 0){
+            return 'w';
         }
         else //if (this.getRandomNumber(2) == 1)
         {
@@ -184,13 +184,13 @@ public class DataGenerator {
 
 
     public String genererateRandomFamilienstand(){
-        return Familienstand.values()[getRandomNumber(Familienstand.values().length)].toString();
+        return Familienstand.values()[generateRandomNumber(Familienstand.values().length)].toString();
     }
 
 
-    public String getRandomBeruf() throws URISyntaxException, IOException {
+    public String generateRandomBeruf() throws URISyntaxException, IOException {
         Berufe beruf = new Berufe();
-        return beruf.getBerufe().get(getRandomNumber(beruf.getBerufe().size() - 1));
+        return beruf.getBerufe().get(generateRandomNumber(beruf.getBerufe().size() - 1));
     }
 
 }

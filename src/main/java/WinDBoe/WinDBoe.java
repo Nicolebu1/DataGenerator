@@ -18,7 +18,6 @@ public class WinDBoe extends DataGenerator {
     ArrayList<Produkt> Produkte = new ArrayList<>();
     ArrayList<Mitarbeiter> Mitarbeiter = new ArrayList<>();
     ArrayList<Integer> fhmids = new ArrayList<Integer>();
-
     Adresse adress;
     Random random = new Random();
 
@@ -34,6 +33,7 @@ public class WinDBoe extends DataGenerator {
         getMitarbeiter();
         getProdukte();
         getFirmenhandys();
+        super.closeConnection();
     }
 
 
@@ -114,7 +114,7 @@ public class WinDBoe extends DataGenerator {
 
 
     public Filiale getRandomFiliale() {
-        return Filialen.get(getRandomNumber(Filialen.size() - 1));
+        return Filialen.get(generateRandomNumber(Filialen.size() - 1));
     }
 
 
@@ -128,12 +128,12 @@ public class WinDBoe extends DataGenerator {
             }
         }
         //choose Mitarbeiter
-        return FilialenMitarbeiter.get(getRandomNumber(FilialenMitarbeiter.size() - 1));
+        return FilialenMitarbeiter.get(generateRandomNumber(FilialenMitarbeiter.size() - 1));
     }
 
 
     public Mitarbeiter getRandomMitarbeiter() {
-        return Mitarbeiter.get(getRandomNumber(Mitarbeiter.size() - 1));
+        return Mitarbeiter.get(generateRandomNumber(Mitarbeiter.size() - 1));
     }
 
 
@@ -153,11 +153,11 @@ public class WinDBoe extends DataGenerator {
         int mid = getRandomMitarbeiterFromFiliale(fid).getMid();
 
         //choose Produkte
-        int numberOfProdukte = 1 + getRandomNumber(14);         //note: Produkteanzahl can't be 0
+        int numberOfProdukte = 1 + generateRandomNumber(14);         //note: Produkteanzahl can't be 0
         ArrayList<Produkt> buyed = new ArrayList<>();
 
         for (int i = 0; i < numberOfProdukte; i++) {
-            buyed.add(Produkte.get(getRandomNumber(Produkte.size() - 1)));
+            buyed.add(Produkte.get(generateRandomNumber(Produkte.size() - 1)));
         }
 
         //count different Produkte
@@ -216,7 +216,7 @@ public class WinDBoe extends DataGenerator {
 
         //set specific data
         double bg = super.generateRandomDecimal(2100, 3750);
-        Enum taetigkeit = Taetigkeit.values()[getRandomNumber(Taetigkeit.values().length)];
+        Enum taetigkeit = Taetigkeit.values()[generateRandomNumber(Taetigkeit.values().length)];
 
         //generate Mitarbeiterausweis
         int maid = generateMitarbeiterausweis(mid);
@@ -232,7 +232,7 @@ public class WinDBoe extends DataGenerator {
         String sql;
 
         if (vorgesID == 0) {
-            sql = "INSERT INTO mitarbeiter (mid, vorname, nachname, strasse, plz, ort, bg, taetigkeit, fid, geburtsdatum, maid VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", '" + geburtsdatum + "', " + maid + ");";
+            sql = "INSERT INTO mitarbeiter (mid, vorname, nachname, strasse, plz, ort, bg, taetigkeit, fid, geburtsdatum, maid) VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", '" + geburtsdatum + "', " + maid + ");";
         } else {
             sql = "INSERT INTO mitarbeiter VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", " + vorgesID + ", '" + geburtsdatum + "', " + maid + ");";
         }
@@ -243,7 +243,7 @@ public class WinDBoe extends DataGenerator {
 
     public int generateMitarbeiterausweis(int mid) {
         int maid = 1000 + mid;
-        String berechtigungen = "Stufe: " + super.getRandomNumber(5);
+        String berechtigungen = "Stufe: " + super.generateRandomNumber(5);
         Date gueltigBis = super.generateRandomDate(2021, 2023);
 
 
@@ -326,7 +326,7 @@ public class WinDBoe extends DataGenerator {
         //set cooperate form
         String[] cooperateform = {"OG", "KG", "Co.KG", "AG"};
 
-        String lieferantenname = super.generateRandomNachname() + " " + cooperateform[super.getRandomNumber(cooperateform.length - 1)];
+        String lieferantenname = super.generateRandomNachname() + " " + cooperateform[super.generateRandomNumber(cooperateform.length - 1)];
         double rechnungsbetrag = super.generateRandomDecimal(100, 15000);
         Date rechnungsdatum = super.generateRandomDate(2021, 2022);
 

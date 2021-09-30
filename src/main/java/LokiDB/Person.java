@@ -1,11 +1,13 @@
 package LokiDB;
 
+import Main.DataGenerator;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.Date;
 import java.text.ParseException;
 
-public class Person extends LokiDB{
+public class Person extends DataGenerator {
 
     int PersID;
     char sex;
@@ -18,7 +20,6 @@ public class Person extends LokiDB{
     int adressenID;
 
     public Person() throws URISyntaxException, IOException, ParseException {
-        super();
         PersID = super.getHighestID("SELECT * FROM Person;", "persid") + 1;
         sex = super.generateRandomSex();
         vorname = super.generateRandomVorname(sex);
@@ -27,7 +28,7 @@ public class Person extends LokiDB{
         telefon = super.generateTelNr();
         familienstand = super.genererateRandomFamilienstand();
         landID = "AUT";
-        adressenID = super.getRandomNumber(super.getHighestID("SELECT * FROM adresse", "adressenid"));
+        adressenID = super.generateRandomNumber(super.getHighestID("SELECT * FROM adresse", "adressenid"));
     }
 
     public int getPersID() {

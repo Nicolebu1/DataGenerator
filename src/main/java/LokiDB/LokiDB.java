@@ -19,7 +19,10 @@ public class LokiDB extends DataGenerator {
 
 
     public LokiDB() throws URISyntaxException, IOException, ParseException {
-        //super.createConnection("jdbc:postgresql://localhost:5432/LokiDB");
+        super.closeConnection();
+        super.createConnection("jdbc:postgresql://localhost:5432/LokiDB");
+        getErmittler();
+        super.closeConnection();
     }
 
 
@@ -53,37 +56,48 @@ public class LokiDB extends DataGenerator {
     //------------------------------------GENERATE----------------------------------------
 
 
-    public void generatePerson() throws URISyntaxException, IOException, ParseException {
+    public Person generatePerson() throws URISyntaxException, IOException, ParseException {
         Person person = new Person();
+        String sql = "INSERT INTO person (" + person.getPersID() + ", " + person.getVorname() + ", " + person.getNachname() + ", " + person.getSex() + ", " + person.getGeburtsdatum() + ", " + person.getTelefon() + ", " + person.getFamilienstand() + ", " + person.getLandID() + ", " + person.getAdressenID() + ");";
+        System.out.println(sql);
+        //sendToDatabase(sql);
+        return person;
     }
 
 
     public void generateZeuge() throws URISyntaxException, IOException, ParseException {
-        Person zeuge = new Person();
-        String beruf = super.getRandomBeruf();
+        Person zeuge = generatePerson();
+        String beruf = super.generateRandomBeruf();
+        String sql = "INSERT INTO zeuge (PersID, Beruf) VALUES (" + zeuge.getPersID() + ", " + beruf + ");";
+        super.sendToDatabase(sql);
     }
 
 
     public void generateGeschaedigter() throws URISyntaxException, IOException, ParseException {
-        Person geschaedigter = new Person();
-        String beruf = super.getRandomBeruf();
+        Person geschaedigter = generatePerson();
+        String beruf = super.generateRandomBeruf();
         String blutgruppe = getRandomBlutgruppe();
+        String sql = "INSERT INTO geschaedigter (persID, beruf) VALUES (" + geschaedigter.getPersID() + ", " + beruf + ", " + blutgruppe + ");";
+        super.sendToDatabase(sql);
     }
 
 
     public void generateVerdaechtiger() throws URISyntaxException, IOException, ParseException {
-        Person verdaechtiger = new Person();
-        int groesse = super.getRandomNumber(130, 210);
+        Person verdaechtiger = generatePerson();
+        int groesse = super.generateRandomNumber(130, 210);
         //pseudonym
         //bandenname
-        String beruf = super.getRandomBeruf();
+        String beruf = super.generateRandomBeruf();
         String haarfarbe = getRandomHaarfarbe();
-        int schuhgroesse = super.getRandomNumber(36, 47);
+        int schuhgroesse = super.generateRandomNumber(36, 47);
         String augenfarbe = getRandomAugenfarbe();
         String blutgruppe = getRandomBlutgruppe();
         String fotolink = generateRandomLink();
         String fingerabdrucklink = generateRandomLink();
         double ergreifbel = super.generateRandomDecimal(200, 3000);
+
+        String sql = "INSERT INTO verdaechtiger (" + verdaechtiger.getPersID() + ", " + groesse + ", " + beruf + ", " + haarfarbe + ", " + schuhgroesse + ", " + augenfarbe + ", " + blutgruppe + ", " + fotolink + ", " + fingerabdrucklink + ", " + ergreifbel + ");";
+        sendToDatabase(sql);
     }
 
 
@@ -96,23 +110,53 @@ public class LokiDB extends DataGenerator {
 
     public String getRandomBlutgruppe(){
         String[] blutgruppen= {"A+", "A-", "B+", "B-", "AB+", "AB-", "0+", "0-"};
-        return blutgruppen[getRandomNumber(blutgruppen.length-1)];
+        return blutgruppen[generateRandomNumber(blutgruppen.length-1)];
     }
 
 
     public String getRandomHaarfarbe(){
         String[] haarfarben = {"Weiß", "Grau", "Blond", "Rot", "Brünett", "Hellbraun", "Dunkelbraun", "Schwarz"};
-        return haarfarben[getRandomNumber(haarfarben.length-1)];
+        return haarfarben[generateRandomNumber(haarfarben.length-1)];
     }
 
 
     public String getRandomAugenfarbe(){
         String[] augenfarben = {"Blau", "Grau", "Grün", "Braun"};
-        return augenfarben[getRandomNumber(augenfarben.length-1)];
+        return augenfarben[generateRandomNumber(augenfarben.length-1)];
     }
 
 
     public String generateRandomLink(){
-        return "http://polizeiinspektion.db/"+getRandomNumber(15483, 178269);
+        return "http://polizeiinspektion.db/"+ generateRandomNumber(15483, 178269);
     }
 }
+
+/*      Team - Namen
+
+        ALPHA
+        BRAVO
+        CHARLIE
+        DELTA
+        ECHO
+        FOXTROT
+        GOLF
+        HOTEL
+        INDIA
+        JULIETT
+        KILO
+        LIMA
+        MIKE
+        NOVEMBER
+        OSCAR
+        PAPA
+        QUEBEC
+        ROMEO
+        SIERRA
+        TANGO
+        UNIFORM
+        VICTOR
+        WHISKEY
+        XRAY
+        YANKEE
+        ZULU
+ */

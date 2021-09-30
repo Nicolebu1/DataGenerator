@@ -26,6 +26,6 @@ public class Ermittler extends DataGenerator {
 
     String generateVerwendungsgruppe(){
         String[] verwendungsgruppe = {"E2b", "E2a", "E1"};
-        return verwendungsgruppe[super.getRandomNumber(2)];
+        return verwendungsgruppe[super.generateRandomNumber(2)];
     }
 }
