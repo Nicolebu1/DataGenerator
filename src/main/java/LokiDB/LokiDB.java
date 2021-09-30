@@ -7,10 +7,12 @@ import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class LokiDB extends DataGenerator {
 
     ArrayList<Ermittler> ermittler = new ArrayList<>();
+    Random random = new Random();
 
 
     public static void main(String[] args) throws URISyntaxException, IOException, ParseException {
@@ -22,6 +24,7 @@ public class LokiDB extends DataGenerator {
         super.closeConnection();
         super.createConnection("jdbc:postgresql://localhost:5432/LokiDB");
         getErmittler();
+        generateErmittler();
         super.closeConnection();
     }
 
@@ -40,8 +43,7 @@ public class LokiDB extends DataGenerator {
                 try {
                     vorgesid = rs.getInt("vorgesid");
                     ermittler.add(new Ermittler(persid, verwgr, dstgr, vorgesid));
-                }
-                catch (NullPointerException e){
+                } catch (NullPointerException e) {
                     ermittler.add(new Ermittler(persid, verwgr, dstgr));
                 }
             }
@@ -76,7 +78,7 @@ public class LokiDB extends DataGenerator {
     public void generateGeschaedigter() throws URISyntaxException, IOException, ParseException {
         Person geschaedigter = generatePerson();
         String beruf = super.generateRandomBeruf();
-        String blutgruppe = getRandomBlutgruppe();
+        String blutgruppe = generateRandomBlutgruppe();
         String sql = "INSERT INTO geschaedigter (persID, beruf) VALUES (" + geschaedigter.getPersID() + ", " + beruf + ", " + blutgruppe + ");";
         super.sendToDatabase(sql);
     }
@@ -88,10 +90,10 @@ public class LokiDB extends DataGenerator {
         //pseudonym
         //bandenname
         String beruf = super.generateRandomBeruf();
-        String haarfarbe = getRandomHaarfarbe();
+        String haarfarbe = generateRandomHaarfarbe();
         int schuhgroesse = super.generateRandomNumber(36, 47);
-        String augenfarbe = getRandomAugenfarbe();
-        String blutgruppe = getRandomBlutgruppe();
+        String augenfarbe = generateRandomAugenfarbe();
+        String blutgruppe = generateRandomBlutgruppe();
         String fotolink = generateRandomLink();
         String fingerabdrucklink = generateRandomLink();
         double ergreifbel = super.generateRandomDecimal(200, 3000);
@@ -102,37 +104,53 @@ public class LokiDB extends DataGenerator {
 
 
     public void generateErmittler() throws URISyntaxException, IOException, ParseException {
+        Person Eperson = generatePerson();
+        Ermittler theErmittler;
+        String sql;
 
+        if (random.nextBoolean() == true) {
+            Ermittler vorgesetzter = this.ermittler.get(generateRandomNumber(ermittler.size()));
+            if (vorgesetzter.getVerwgr() == "E2c" || vorgesetzter.getVerwgr() == "E2b") {
+                theErmittler = new Ermittler(Eperson.PersID);
+                sql = "INSERT INTO ermittler (persid, verwgr, dstgr, bg) VALUES (" + Eperson.getPersID() + ", " + theErmittler.getVerwgr() + ", " + theErmittler.getDstgr() + ", " + theErmittler.getBg() + ");";
+            } else {
+                theErmittler = new Ermittler(Eperson.PersID, vorgesetzter.getPersiId());
+                sql = "INSERT INTO ermittler (persid, verwgr, dstgr, bg, vorgesid) VALUES (" + Eperson.getPersID() + ", " + theErmittler.getVerwgr() + ", " + theErmittler.getDstgr() + ", " + theErmittler.getBg() + ", " + vorgesetzter.getPersiId() + ");";
+            }
+        } else {
+            theErmittler = new Ermittler(Eperson.PersID);
+            sql = "INSERT INTO ermittler (persid, verwgr, dstgr, bg) VALUES (" + Eperson.getPersID() + ", " + theErmittler.getVerwgr() + ", " + theErmittler.getDstgr() + ", " + theErmittler.getBg() + ");";
+        }
+        //super.sendToDatabase(sql);
     }
 
 
     // ---------------------------------GENERATE LOKI-SPECIFIC CONTENT--------------------------------------
 
-    public String getRandomBlutgruppe(){
-        String[] blutgruppen= {"A+", "A-", "B+", "B-", "AB+", "AB-", "0+", "0-"};
-        return blutgruppen[generateRandomNumber(blutgruppen.length-1)];
+    public String generateRandomBlutgruppe() {
+        String[] blutgruppen = {"A+", "A-", "B+", "B-", "AB+", "AB-", "0+", "0-"};
+        return blutgruppen[generateRandomNumber(blutgruppen.length - 1)];
     }
 
 
-    public String getRandomHaarfarbe(){
+    public String generateRandomHaarfarbe() {
         String[] haarfarben = {"Weiß", "Grau", "Blond", "Rot", "Brünett", "Hellbraun", "Dunkelbraun", "Schwarz"};
-        return haarfarben[generateRandomNumber(haarfarben.length-1)];
+        return haarfarben[generateRandomNumber(haarfarben.length - 1)];
     }
 
 
-    public String getRandomAugenfarbe(){
+    public String generateRandomAugenfarbe() {
         String[] augenfarben = {"Blau", "Grau", "Grün", "Braun"};
-        return augenfarben[generateRandomNumber(augenfarben.length-1)];
+        return augenfarben[generateRandomNumber(augenfarben.length - 1)];
     }
 
 
-    public String generateRandomLink(){
-        return "http://polizeiinspektion.db/"+ generateRandomNumber(15483, 178269);
+    public String generateRandomLink() {
+        return "http://polizeiinspektion.db/" + generateRandomNumber(15483, 178269);
     }
 }
 
 /*      Team - Namen
-
         ALPHA
         BRAVO
         CHARLIE
