@@ -50,6 +50,20 @@ public class DataGenerator {
         }
     }
 
+    /*
+    boolean askDB(String query) throws SQLException {
+        try {
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery(query);
+            if (rs.isBeforeFirst()) {
+                return true;
+            }
+        }
+        catch (Exception e){}
+        return false;
+    }
+    */
+
 
     //get latest ID
     public int getHighestID(String query, String column) {
@@ -146,17 +160,17 @@ public class DataGenerator {
     }
 
 
-    public String generateEmail(String vorname, String nachname){
-        return vorname+'.'+nachname+"@email.db";
+    public String generateEmail(String vorname, String nachname) {
+        return vorname + '.' + nachname + "@email.db";
     }
 
 
-    public String generateEmail(String vorname, String nachname, String endung){
-        return vorname+'.'+nachname+"@" + endung + ".db";
+    public String generateEmail(String vorname, String nachname, String endung) {
+        return vorname + '.' + nachname + "@" + endung + ".db";
     }
 
 
-    public String generateTelNr(){
+    public String generateTelNr() {
         int number = 10 + generateRandomNumber(89);
         int number1 = 100 + generateRandomNumber(899);
         int number2 = 10 + generateRandomNumber(89);
@@ -164,14 +178,13 @@ public class DataGenerator {
         return "06" + number + " " + number1 + " " + number2 + " " + number3;
     }
 
-    public char generateRandomSex(){
+    public char generateRandomSex() {
 
         //Todo: Implement non-binary options
 
-        if(this.generateRandomNumber(1) == 0){
+        if (this.generateRandomNumber(1) == 0) {
             return 'w';
-        }
-        else //if (this.getRandomNumber(2) == 1)
+        } else //if (this.getRandomNumber(2) == 1)
         {
             return 'm';
         }
@@ -183,7 +196,7 @@ public class DataGenerator {
     }
 
 
-    public String genererateRandomFamilienstand(){
+    public String genererateRandomFamilienstand() {
         return Familienstand.values()[generateRandomNumber(Familienstand.values().length)].toString();
     }
 

@@ -1,10 +1,13 @@
 package LokiDB;
 
+import Main.Adresse;
 import Main.DataGenerator;
+import WinDBoe.Mitarbeiter;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -12,6 +15,10 @@ import java.util.Random;
 public class LokiDB extends DataGenerator {
 
     ArrayList<Ermittler> ermittler = new ArrayList<>();
+    ArrayList<Adresse> adressen = new ArrayList<>();
+    ArrayList<Integer> dstelladdi = new ArrayList<>();
+    ArrayList<Integer> personaddi = new ArrayList<>();
+    ArrayList<Integer> deliktaddi = new ArrayList<>();
     Random random = new Random();
 
 
@@ -20,10 +27,11 @@ public class LokiDB extends DataGenerator {
     }
 
 
-    public LokiDB() throws URISyntaxException, IOException, ParseException {
+    public LokiDB() throws URISyntaxException, IOException, ParseException, SQLException {
         super.closeConnection();
         super.createConnection("jdbc:postgresql://localhost:5432/LokiDB");
         getErmittler();
+        getAdressesFromDB();
         generateErmittler();
         super.closeConnection();
     }
@@ -54,6 +62,31 @@ public class LokiDB extends DataGenerator {
         }
     }
 
+
+    public void getAdressesFromDB() throws SQLException {
+        try {
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT * FROM adresse;");
+            while (rs.next()) {
+                adressen.add(new Adresse(rs.getInt("adressenid"), rs.getString("strasse"), rs.getString("ort"), rs.getInt("plz")));
+            }
+            rs = DataGenerator.stmt.executeQuery("SELECT adressenid FROM dienststelle;");
+            while (rs.next()) {
+                dstelladdi.add(rs.getInt("adressenid"));
+            }
+            rs = DataGenerator.stmt.executeQuery("SELECT adressenid FROM person;");
+            while (rs.next()) {
+                personaddi.add(rs.getInt("adressenid"));
+            }
+            rs = DataGenerator.stmt.executeQuery("SELECT adressenid FROM delikt;");
+            while (rs.next()) {
+                deliktaddi.add(rs.getInt("adressenid"));
+            }
+
+
+        } catch (Exception e) {
+        }
+    }
 
     //------------------------------------GENERATE----------------------------------------
 
@@ -125,6 +158,19 @@ public class LokiDB extends DataGenerator {
     }
 
 
+    public void generateDienststelle() {
+        int dstelleID = super.getHighestID("Select * from dienststelle", "dstelleid") + 1;
+        int adressid;
+        boolean available = true;
+        adressid = generateRandomNumber(adressen.size());
+        for (int m : dstelladdi) {
+            if (m == adressid) {
+                available = false;
+            }
+        }
+    }
+
+
     // ---------------------------------GENERATE LOKI-SPECIFIC CONTENT--------------------------------------
 
     public String generateRandomBlutgruppe() {
@@ -148,7 +194,50 @@ public class LokiDB extends DataGenerator {
     public String generateRandomLink() {
         return "http://polizeiinspektion.db/" + generateRandomNumber(15483, 178269);
     }
+
+
+    public int generatePersonAddi() {
+        //Personen living with other persons is okay
+        //Personen living on deliktadressen is okay, when delikttyp fits
+        //Personen living on dienststellen is not okay
+
+        boolean available = true;
+
+        int adressenid = super.generateRandomNumber(adressen.size());
+
+        //TODO
+
+        return adressenid;
+    }
+
+    public int generateDstellenAddi() {
+        //nothing else there besides dienststelle
+
+        int adressid;
+        boolean aval1 = false;
+        boolean aval2 = false;
+
+        //TODO DENKFEHLER! Tut noch nicht was es soll. :(
+
+        do {
+            adressid = super.generateRandomNumber(adressen.size());
+            for (int i : personaddi) {
+                if (i == adressid) {
+                    aval1 = false;
+                } else aval1 = true;
+            }
+
+            for (int i : deliktaddi) {
+                if (i == adressid) {
+                    aval2 = false;
+                } else aval2 = true;
+            }
+        }
+        while (aval1 == false || aval2 == false);
+        return adressid;
+    }
 }
+
 
 /*      Team - Namen
         ALPHA
