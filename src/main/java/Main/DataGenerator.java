@@ -50,20 +50,6 @@ public class DataGenerator {
         }
     }
 
-    /*
-    boolean askDB(String query) throws SQLException {
-        try {
-            DataGenerator.stmt = DataGenerator.c.createStatement();
-            ResultSet rs = DataGenerator.stmt.executeQuery(query);
-            if (rs.isBeforeFirst()) {
-                return true;
-            }
-        }
-        catch (Exception e){}
-        return false;
-    }
-    */
-
 
     //get latest ID
     public int getHighestID(String query, String column) {
@@ -110,6 +96,31 @@ public class DataGenerator {
             return new java.sql.Date(cal.getTimeInMillis());
         }
     }
+
+
+    public Timestamp generateRandomTimestamp(int min, int max) {
+        int startYear = min;
+        int endYear = max;
+        long start = Timestamp.valueOf(startYear + "-1-1 0:0:0").getTime();
+        long end = Timestamp.valueOf(endYear + "-1-1 0:0:0").getTime();
+        long ms = (long) ((end - start) * Math.random() + start);
+        return new Timestamp(ms);
+    }
+
+
+    public Timestamp generateFollowUpTimestamp(Timestamp timestamp1) throws ParseException {
+        {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(timestamp1);
+            cal.add(Calendar.HOUR, generateRandomNumber(5));
+            cal.add(Calendar.MINUTE, generateRandomNumber(59));
+            cal.add(Calendar.SECOND, generateRandomNumber(59));
+            return new java.sql.Timestamp(cal.getTimeInMillis());
+        }
+    }
+
+
+
 
 
     public double generateRandomDecimal(double min, double max) {
@@ -205,6 +216,22 @@ public class DataGenerator {
         Berufe beruf = new Berufe();
         return beruf.getBerufe().get(generateRandomNumber(beruf.getBerufe().size() - 1));
     }
+
+
+    /*
+    boolean askDB(String query) throws SQLException {
+        try {
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery(query);
+            if (rs.isBeforeFirst()) {
+                return true;
+            }
+        }
+        catch (Exception e){}
+        return false;
+    }
+    */
+
 
 }
 
