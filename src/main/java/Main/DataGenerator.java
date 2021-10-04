@@ -120,7 +120,12 @@ public class DataGenerator {
     }
 
 
-
+    public Time generateRandomTime(){
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.HOUR, generateRandomNumber(23));
+        cal.add(Calendar.MINUTE, generateRandomNumber(59));
+        return new java.sql.Time(cal.getTimeInMillis());
+    }
 
 
     public double generateRandomDecimal(double min, double max) {

@@ -1,6 +1,5 @@
 package LokiDB;
 
-import Main.Adresse;
 import Main.DataGenerator;
 
 import java.io.IOException;
@@ -10,7 +9,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class LokiDB extends DataGenerator{
+public class LokiDB extends DataGenerator {
 
     ArrayList<Ermittler> ermittler = new ArrayList<>();
     Random random = new Random();
@@ -26,11 +25,9 @@ public class LokiDB extends DataGenerator{
         super.createConnection("jdbc:postgresql://localhost:5432/LokiDB");
         getErmittler();
         //getAdressesFromDB();
-        Timestamp t1 = generateRandomTimestamp(2021, 2022);
-        System.out.println(t1);
-        System.out.println(super.generateFollowUpTimestamp(t1));
         //generateDienststelle();
         //generateDelikt();
+        //generateIndiz();
         super.closeConnection();
     }
 
@@ -61,8 +58,6 @@ public class LokiDB extends DataGenerator{
     }
 
 
-
-
     //------------------------------------GENERATE----------------------------------------
 
 
@@ -88,7 +83,7 @@ public class LokiDB extends DataGenerator{
         Person geschaedigter = generatePerson();
         String beruf = super.generateRandomBeruf();
         String blutgruppe = generateRandomBlutgruppe();
-        String sql = "INSERT INTO geschaedigter (persID, beruf) VALUES (" + geschaedigter.getPersID() + ", " + beruf + ", " + blutgruppe + ");";
+        String sql = "INSERT INTO geschaedigter VALUES (" + geschaedigter.getPersID() + ", " + beruf + ", " + blutgruppe + ");";
         super.sendToDatabase(sql);
     }
 
@@ -118,7 +113,7 @@ public class LokiDB extends DataGenerator{
         String sql;
 
         if (random.nextBoolean() == true) {
-            Ermittler vorgesetzter = this.ermittler.get(generateRandomNumber(ermittler.size()-1));
+            Ermittler vorgesetzter = this.ermittler.get(generateRandomNumber(ermittler.size() - 1));
             if (vorgesetzter.getVerwgr() == "E2c" || vorgesetzter.getVerwgr() == "E2b") {
                 theErmittler = new Ermittler(Eperson.PersID);
                 sql = "INSERT INTO ermittler (persid, verwgr, dstgr, bg) VALUES (" + Eperson.getPersID() + ", " + theErmittler.getVerwgr() + ", " + theErmittler.getDstgr() + ", " + theErmittler.getBg() + ");";
@@ -159,7 +154,7 @@ public class LokiDB extends DataGenerator{
         Timestamp tatzeitBis = super.generateFollowUpTimestamp(tatzeitVon);
         Timestamp erfassungszeitpunkt = super.generateFollowUpTimestamp(tatzeitBis);
 
-        //Todo : Beschreibung
+        //Todo : beschreibung
         String beschreibung = "NULL";
 
         double schadenshoehe;
@@ -185,35 +180,67 @@ public class LokiDB extends DataGenerator{
     }
 
 
-    // ---------------------------------GENERATE LOKI-SPECIFIC CONTENT--------------------------------------
+    public void generateIndiz() {
+        //Indiz (IndizID, Beschreibung, Funddatum, Fundzeit, zugelBeweis, DeliktID)
+        int indizid = super.getHighestID("SELECT * FROM indiz", "indizid");
+        //Todo : beschreibung
+        String beschreibung = "NULL";
+        Date funddatum = super.generateRandomDate(2021, 2022);
+        Time fundzeit = super.generateRandomTime();
+        boolean zugelBeweis = random.nextBoolean();
+        //Todo : wo welche Indizien?
+        int deliktid = 0;
 
-    public String generateRandomBlutgruppe() {
-        String[] blutgruppen = {"A+", "A-", "B+", "B-", "AB+", "AB-", "0+", "0-"};
-        return blutgruppen[generateRandomNumber(blutgruppen.length - 1)];
+        String sql = "INSERT INTO indiz (" + indizid + ", " + beschreibung + ", " + funddatum + ", " + fundzeit + ", " + zugelBeweis + ", " + deliktid +");";
+        //super.sendToDatabase(sql);
+        System.out.println(sql);
     }
 
 
-    public String generateRandomHaarfarbe() {
-        String[] haarfarben = {"Weiß", "Grau", "Blond", "Rot", "Brünett", "Hellbraun", "Dunkelbraun", "Schwarz"};
-        return haarfarben[generateRandomNumber(haarfarben.length - 1)];
+    public void generateBeute(){
+
+        //Choose suitable delikttyp
+        try {
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT deliktid FROM delikt WHERE delikttyp IN (5, 7, 13);");
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 
 
-    public String generateRandomAugenfarbe() {
-        String[] augenfarben = {"Blau", "Grau", "Grün", "Braun"};
-        return augenfarben[generateRandomNumber(augenfarben.length - 1)];
-    }
+
+        // ---------------------------------GENERATE LOKI-SPECIFIC CONTENT--------------------------------------
 
 
-    public String generateRandomLink() {
-        return "http://polizeiinspektion.db/" + generateRandomNumber(15483, 178269);
-    }
+        public String generateRandomBlutgruppe () {
+            String[] blutgruppen = {"A+", "A-", "B+", "B-", "AB+", "AB-", "0+", "0-"};
+            return blutgruppen[generateRandomNumber(blutgruppen.length - 1)];
+        }
 
-    public String generateRandomStatus() {
-        String[] status = {"wiederaufgenommen", "gelöst", "laufend", "abgelegt"};
-        return status[generateRandomNumber(status.length - 1)];
+
+        public String generateRandomHaarfarbe () {
+            String[] haarfarben = {"Weiß", "Grau", "Blond", "Rot", "Brünett", "Hellbraun", "Dunkelbraun", "Schwarz"};
+            return haarfarben[generateRandomNumber(haarfarben.length - 1)];
+        }
+
+
+        public String generateRandomAugenfarbe () {
+            String[] augenfarben = {"Blau", "Grau", "Grün", "Braun"};
+            return augenfarben[generateRandomNumber(augenfarben.length - 1)];
+        }
+
+
+        public String generateRandomLink () {
+            return "http://polizeiinspektion.db/" + generateRandomNumber(15483, 178269);
+        }
+
+        public String generateRandomStatus () {
+            String[] status = {"wiederaufgenommen", "gelöst", "laufend", "abgelegt"};
+            return status[generateRandomNumber(status.length - 1)];
+        }
     }
-}
 
 
 /*      Team - Namen
