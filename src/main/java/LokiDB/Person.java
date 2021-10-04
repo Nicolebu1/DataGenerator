@@ -19,16 +19,16 @@ public class Person extends DataGenerator {
     String landID;
     int adressenID;
 
-    public Person() throws URISyntaxException, IOException, ParseException {
-        PersID = super.getHighestID("SELECT * FROM Person;", "persid") + 1;
-        sex = super.generateRandomSex();
-        vorname = super.generateRandomVorname(sex);
-        nachname = super.generateRandomNachname();
-        geburtsdatum = super.generateRandomDate(1940, 2001);
-        telefon = super.generateTelNr();
-        familienstand = super.genererateRandomFamilienstand();
-        landID = "AUT";
-        adressenID = super.generateRandomNumber(super.getHighestID("SELECT * FROM adresse", "adressenid"));
+    public Person(int adressenID) throws URISyntaxException, IOException, ParseException {
+        this.PersID = super.getHighestID("SELECT * FROM Person;", "persid") + 1;
+        this.sex = super.generateRandomSex();
+        this.vorname = super.generateRandomVorname(sex);
+        this.nachname = super.generateRandomNachname();
+        this.geburtsdatum = super.generateRandomDate(1940, 2001);
+        this.telefon = super.generateTelNr();
+        this.familienstand = super.genererateRandomFamilienstand();
+        this.landID = "AUT";
+        this.adressenID = adressenID;
     }
 
     public int getPersID() {

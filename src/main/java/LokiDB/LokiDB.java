@@ -2,7 +2,6 @@ package LokiDB;
 
 import Main.Adresse;
 import Main.DataGenerator;
-import WinDBoe.Mitarbeiter;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -22,7 +21,7 @@ public class LokiDB extends DataGenerator {
     Random random = new Random();
 
 
-    public static void main(String[] args) throws URISyntaxException, IOException, ParseException {
+    public static void main(String[] args) throws URISyntaxException, IOException, ParseException, SQLException {
         LokiDB lokiDB = new LokiDB();
     }
 
@@ -32,7 +31,7 @@ public class LokiDB extends DataGenerator {
         super.createConnection("jdbc:postgresql://localhost:5432/LokiDB");
         getErmittler();
         getAdressesFromDB();
-        generateErmittler();
+        generateDienststelle();
         super.closeConnection();
     }
 
@@ -92,7 +91,7 @@ public class LokiDB extends DataGenerator {
 
 
     public Person generatePerson() throws URISyntaxException, IOException, ParseException {
-        Person person = new Person();
+        Person person = new Person(generatePersonAddi());
         String sql = "INSERT INTO person (" + person.getPersID() + ", " + person.getVorname() + ", " + person.getNachname() + ", " + person.getSex() + ", " + person.getGeburtsdatum() + ", " + person.getTelefon() + ", " + person.getFamilienstand() + ", " + person.getLandID() + ", " + person.getAdressenID() + ");";
         System.out.println(sql);
         //sendToDatabase(sql);
@@ -120,8 +119,8 @@ public class LokiDB extends DataGenerator {
     public void generateVerdaechtiger() throws URISyntaxException, IOException, ParseException {
         Person verdaechtiger = generatePerson();
         int groesse = super.generateRandomNumber(130, 210);
-        //pseudonym
-        //bandenname
+        //Todo : pseudonym
+        //Todo : bandenname
         String beruf = super.generateRandomBeruf();
         String haarfarbe = generateRandomHaarfarbe();
         int schuhgroesse = super.generateRandomNumber(36, 47);
@@ -158,16 +157,27 @@ public class LokiDB extends DataGenerator {
     }
 
 
+    //Todo: Fix connection
     public void generateDienststelle() {
         int dstelleID = super.getHighestID("Select * from dienststelle", "dstelleid") + 1;
-        int adressid;
-        boolean available = true;
-        adressid = generateRandomNumber(adressen.size());
-        for (int m : dstelladdi) {
-            if (m == adressid) {
-                available = false;
-            }
+        int adressid = generateDstellenAddi();
+        String name;
+        try {
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT ort FROM adresse where adressenid = " + adressid + ";");
+            name = "Polizeidienststelle " + rs.getString("ort");
+            String sql = "INSERT INTO dienststelle VALUES (" + dstelleID + ", " + name + ", " + adressid +");";
+            System.out.println(sql);
+            //super.sendToDatabase(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+    }
+
+
+    public void generateDelikt(){
+        //Delikt (DeliktID, Erfassungszeitpunkt, Beschreibung, TatzeitVon, TatzeitBis, Schadenshoehe, Status,
+        //DelikttypID, AdressenID)
     }
 
 
@@ -198,42 +208,84 @@ public class LokiDB extends DataGenerator {
 
     public int generatePersonAddi() {
         //Personen living with other persons is okay
-        //Personen living on deliktadressen is okay, when delikttyp fits
+        //Personen living on deliktadressen is okay, when delikttyp is not 3 or 7
         //Personen living on dienststellen is not okay
 
-        boolean available = true;
+        int adressid = 0;
 
-        int adressenid = super.generateRandomNumber(adressen.size());
-
-        //TODO
-
-        return adressenid;
+        try {
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT adressenid FROM dienststelle");
+            ResultSet rs2 = DataGenerator.stmt.executeQuery("SELECT adressenid, delikttypid FROM delikt");
+            do {
+                adressid = super.generateRandomNumber(adressen.size());
+                while (rs.next()) {
+                    if (rs.getInt("adressenid") == adressid) {
+                        adressid = 0;
+                        break;
+                    }
+                }
+                while (rs2.next()) {
+                    if (rs.getInt("adressenid") == adressid && (rs.getInt("delikttypid") == 3 || rs.getInt("delikttypid") == 7)) {
+                        adressid = 0;
+                        break;
+                    }
+                }
+            }
+            while (adressid == 0);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return adressid;
     }
+
 
     public int generateDstellenAddi() {
         //nothing else there besides dienststelle
 
-        int adressid;
-        boolean aval1 = false;
-        boolean aval2 = false;
+        int adressid = 0;
 
-        //TODO DENKFEHLER! Tut noch nicht was es soll. :(
-
-        do {
-            adressid = super.generateRandomNumber(adressen.size());
-            for (int i : personaddi) {
-                if (i == adressid) {
-                    aval1 = false;
-                } else aval1 = true;
+        try {
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT adressenid FROM person UNION SELECT adressenid FROM delikt UNION SELECT adressenid FROM dienststelle");
+            do {
+                adressid = super.generateRandomNumber(adressen.size());
+                while (rs.next()) {
+                    if (rs.getInt("adressenid") == adressid) {
+                        adressid = 0;
+                        break;
+                    }
+                }
             }
-
-            for (int i : deliktaddi) {
-                if (i == adressid) {
-                    aval2 = false;
-                } else aval2 = true;
-            }
+            while (adressid == 0);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
-        while (aval1 == false || aval2 == false);
+        return adressid;
+    }
+
+
+    public int generateDeliktAddi() {
+        //crime happens everywhere, except dienststelle
+
+        int adressid = 0;
+
+        try {
+            DataGenerator.stmt = DataGenerator.c.createStatement();
+            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT adressenid FROM delikt");
+            do {
+                adressid = super.generateRandomNumber(adressen.size());
+                while (rs.next()) {
+                    if (rs.getInt("adressenid") == adressid) {
+                        adressid = 0;
+                        break;
+                    }
+                }
+            }
+            while (adressid == 0);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
         return adressid;
     }
 }
