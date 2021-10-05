@@ -6,6 +6,7 @@ import Main.DataGenerator;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class AdressenErmittler extends DataGenerator {
 
@@ -75,20 +76,27 @@ public class AdressenErmittler extends DataGenerator {
         //Personen living on dienststellen is not okay
 
         int adressid = 0;
+        ArrayList<Integer> dstellenids = new ArrayList<>();
 
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
             ResultSet rs = DataGenerator.stmt.executeQuery("SELECT adressenid FROM dienststelle");
-            ResultSet rs2 = DataGenerator.stmt.executeQuery("SELECT adressenid, delikttypid FROM delikt");
+            while (rs.next()){
+                dstellenids.add(rs.getInt("adressenid"));
+            }
+            rs.close();
+
+            rs = DataGenerator.stmt.executeQuery("SELECT adressenid, delikttypid FROM delikt");
+            Iterator i = dstellenids.iterator();
             do {
                 adressid = super.generateRandomNumber(adressen.size()-1);
-                while (rs.next()) {
-                    if (rs.getInt("adressenid") == adressid) {
+                while (i.hasNext()) {
+                    if ((Integer) i.next() == adressid) {
                         adressid = 0;
                         break;
                     }
                 }
-                while (rs2.next()) {
+                while (rs.next()) {
                     if (rs.getInt("adressenid") == adressid && (rs.getInt("delikttypid") == 3 || rs.getInt("delikttypid") == 7)) {
                         adressid = 0;
                         break;

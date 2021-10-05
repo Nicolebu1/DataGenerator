@@ -68,6 +68,7 @@ public class Ermittler extends DataGenerator {
             Dsgr.add("Generalmajor");
             Dsgr.add("General");
 
+            this.dstgr = Dsgr.get(super.generateRandomNumber(Dsgr.size()-1));
             this.bg = super.generateRandomDecimal(2377, 4376);
         }
         else if (this.getVerwgr() == "E2a"){
@@ -77,6 +78,7 @@ public class Ermittler extends DataGenerator {
             Dsgr.add("ChefInsp");
             Dsgr.add("KontrInsp");
 
+            this.dstgr = Dsgr.get(super.generateRandomNumber(Dsgr.size()-1));
             this.bg = super.generateRandomDecimal(2072, 3216);
         }
         else if (this.getVerwgr() == "E2b"){
@@ -84,6 +86,7 @@ public class Ermittler extends DataGenerator {
             Dsgr.add("RI");     //Revierinspektor
             Dsgr.add("GI");     //Gruppeninspektor
 
+            this.dstgr = Dsgr.get(super.generateRandomNumber(Dsgr.size()-1));
             this.bg = super.generateRandomDecimal(1873, 3029);
         }
         else{
@@ -106,13 +109,6 @@ public class Ermittler extends DataGenerator {
         return bg;
     }
 
-    public int getVorgesID() {
-        return vorgesID;
-    }
-
-    public int getTeamID() {
-        return teamID;
-    }
 
     public int getPersiId(){
         return persiId;

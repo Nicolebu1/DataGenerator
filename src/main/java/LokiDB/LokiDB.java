@@ -20,9 +20,7 @@ public class LokiDB extends DataGenerator {
     public LokiDB() throws Exception {
         super.createConnection("jdbc:postgresql://localhost:5432/LokiDB");
         getErmittler();
-        generateZeuge();
-        //generateDelikt();
-        //generateIndiz();
+        generateIndiz();
         super.closeConnection();
     }
 
@@ -69,7 +67,7 @@ public class LokiDB extends DataGenerator {
     public void generateZeuge() throws Exception {
         Person zeuge = generatePerson();
         String beruf = super.generateRandomBeruf();
-        String sql = "INSERT INTO zeuge (PersID, Beruf) VALUES (" + zeuge.getPersID() + ", " + beruf + ");";
+        String sql = "INSERT INTO zeuge VALUES ('" + beruf + "', " + zeuge.getPersID() + ");";
         super.sendToDatabase(sql);
     }
 
@@ -78,7 +76,7 @@ public class LokiDB extends DataGenerator {
         Person geschaedigter = generatePerson();
         String beruf = super.generateRandomBeruf();
         String blutgruppe = generateRandomBlutgruppe();
-        String sql = "INSERT INTO geschaedigter VALUES (" + geschaedigter.getPersID() + ", " + beruf + ", " + blutgruppe + ");";
+        String sql = "INSERT INTO geschaedigter VALUES ('" + beruf + "', '" + blutgruppe + "', " + + geschaedigter.getPersID() + ");";
         super.sendToDatabase(sql);
     }
 
@@ -87,7 +85,9 @@ public class LokiDB extends DataGenerator {
         Person verdaechtiger = generatePerson();
         int groesse = super.generateRandomNumber(130, 210);
         //Todo : pseudonym
+        String pseudonym = "NULL";
         //Todo : bandenname
+        String bandenname = "NULL";
         String beruf = super.generateRandomBeruf();
         String haarfarbe = generateRandomHaarfarbe();
         int schuhgroesse = super.generateRandomNumber(36, 47);
@@ -97,7 +97,7 @@ public class LokiDB extends DataGenerator {
         String fingerabdrucklink = generateRandomLink();
         double ergreifbel = super.generateRandomDecimal(200, 3000);
 
-        String sql = "INSERT INTO verdaechtiger (" + verdaechtiger.getPersID() + ", " + groesse + ", " + beruf + ", " + haarfarbe + ", " + schuhgroesse + ", " + augenfarbe + ", " + blutgruppe + ", " + fotolink + ", " + fingerabdrucklink + ", " + ergreifbel + ");";
+        String sql = "INSERT INTO verdaechtiger VALUES (" + groesse + ", '" + pseudonym + "', '" + bandenname + "', '" +  beruf + "', '" + haarfarbe + "', " + schuhgroesse + ", '" + augenfarbe + "', '" + blutgruppe + "', '" + fotolink + "', '" + fingerabdrucklink + "', " + ergreifbel + ", " + verdaechtiger.getPersID() + ");";
         sendToDatabase(sql);
     }
 
@@ -107,20 +107,20 @@ public class LokiDB extends DataGenerator {
         Ermittler theErmittler;
         String sql;
 
-        if (random.nextBoolean() == true) {
+        if (random.nextBoolean() == true) {         //vorgesetzer or not
             Ermittler vorgesetzter = this.ermittler.get(generateRandomNumber(ermittler.size() - 1));
-            if (vorgesetzter.getVerwgr() == "E2c" || vorgesetzter.getVerwgr() == "E2b") {
+            if (vorgesetzter.getVerwgr() == "E2c" || vorgesetzter.getVerwgr() == "E2b") {           //vorgesetzter not suitable
                 theErmittler = new Ermittler(Eperson.PersID);
-                sql = "INSERT INTO ermittler (persid, verwgr, dstgr, bg) VALUES (" + Eperson.getPersID() + ", " + theErmittler.getVerwgr() + ", " + theErmittler.getDstgr() + ", " + theErmittler.getBg() + ");";
+                sql = "INSERT INTO ermittler (persid, verwgr, dstgr, bg) VALUES (" + Eperson.getPersID() + ", '" + theErmittler.getVerwgr() + "', '" + theErmittler.getDstgr() + "', " + theErmittler.getBg() + ");";
             } else {
                 theErmittler = new Ermittler(Eperson.PersID, vorgesetzter.getPersiId());
-                sql = "INSERT INTO ermittler (persid, verwgr, dstgr, bg, vorgesid) VALUES (" + Eperson.getPersID() + ", " + theErmittler.getVerwgr() + ", " + theErmittler.getDstgr() + ", " + theErmittler.getBg() + ", " + vorgesetzter.getPersiId() + ");";
+                sql = "INSERT INTO ermittler (persid, verwgr, dstgr, bg, vorgesid) VALUES (" + Eperson.getPersID() + ", '" + theErmittler.getVerwgr() + "', '" + theErmittler.getDstgr() + "', " + theErmittler.getBg() + ", " + vorgesetzter.getPersiId() + ");";
             }
         } else {
             theErmittler = new Ermittler(Eperson.PersID);
-            sql = "INSERT INTO ermittler (persid, verwgr, dstgr, bg) VALUES (" + Eperson.getPersID() + ", " + theErmittler.getVerwgr() + ", " + theErmittler.getDstgr() + ", " + theErmittler.getBg() + ");";
+            sql = "INSERT INTO ermittler (persid, verwgr, dstgr, bg) VALUES (" + Eperson.getPersID() + ", '" + theErmittler.getVerwgr() + "', '" + theErmittler.getDstgr() + "', " + theErmittler.getBg() + ");";
         }
-        //super.sendToDatabase(sql);
+        super.sendToDatabase(sql);
     }
 
 
@@ -143,7 +143,6 @@ public class LokiDB extends DataGenerator {
 
 
     public void generateDelikt() throws Exception {
-        //Status, AdressenID)
         int deliktid = super.getHighestID("Select * from delikt", "deliktid") + 1;
         Timestamp tatzeitVon = super.generateRandomTimestamp(2021, 2022);
         Timestamp tatzeitBis = super.generateFollowUpTimestamp(tatzeitVon);
@@ -169,15 +168,13 @@ public class LokiDB extends DataGenerator {
 
         String status = generateRandomStatus();
 
-        String sql = "INSERT INTO delikt VALUES (" + deliktid + ", " + erfassungszeitpunkt + ", " + beschreibung + ", " + tatzeitVon + ", " + tatzeitBis + ", " + schadenshoehe + ", " + status + ", " + delikttypid + ", " + adressenid + ");";
-        System.out.println(sql);
-        //sendToDatabase(sql);
+        String sql = "INSERT INTO delikt (deliktid, erfassungszeitpunkt, beschreibung, tatzeitvon, tatzeitbis, schadenshoehe, status, delikttypid, adressenid) VALUES (" + deliktid + ", '" + erfassungszeitpunkt + "', '" + beschreibung + "', '" + tatzeitVon + "', '" + tatzeitBis + "', " + schadenshoehe + ", '" + status + "', " + delikttypid + ", " + adressenid + ");";
+        sendToDatabase(sql);
     }
 
 
     public void generateIndiz() {
-        //Indiz (IndizID, Beschreibung, Funddatum, Fundzeit, zugelBeweis, DeliktID)
-        int indizid = super.getHighestID("SELECT * FROM indiz", "indizid");
+        int indizid = super.getHighestID("SELECT * FROM indiz", "indizid") + 1;
         //Todo : beschreibung
         String beschreibung = "NULL";
         Date funddatum = super.generateRandomDate(2021, 2022);
@@ -186,8 +183,8 @@ public class LokiDB extends DataGenerator {
         //Todo : wo welche Indizien?
         int deliktid = 0;
 
-        String sql = "INSERT INTO indiz (" + indizid + ", " + beschreibung + ", " + funddatum + ", " + fundzeit + ", " + zugelBeweis + ", " + deliktid +");";
-        //super.sendToDatabase(sql);
+        String sql = "INSERT INTO indiz VALUES (" + indizid + ", '" + beschreibung + "', '" + funddatum + "', '" + fundzeit + "', '" + zugelBeweis + "', " + deliktid +");";
+        super.sendToDatabase(sql);
         System.out.println(sql);
     }
 

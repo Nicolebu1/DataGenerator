@@ -3,6 +3,7 @@ package Main;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 
@@ -129,7 +130,8 @@ public class DataGenerator {
 
 
     public double generateRandomDecimal(double min, double max) {
-        return min + Math.random() * (max - min);
+        double decimal = min + Math.random() * (max - min);
+        return Math.round(decimal * 100.0) / 100.0;
     }
 
 
