@@ -11,15 +11,22 @@ public class AdressenErmittler extends DataGenerator {
 
     int choosenID;
 
-    ArrayList<Adresse> adressen = new ArrayList<>();
+    ArrayList<Adresse> adressen;
     ArrayList<Integer> dstelladdi = new ArrayList<>();
     ArrayList<Integer> personaddi = new ArrayList<>();
     ArrayList<Integer> deliktaddi = new ArrayList<>();
+    Adresse adresse;
 
     public AdressenErmittler(int type) throws Exception {
+
         //type 0 = Person
         //type 1 = Dienststelle
         //type 2 = Delikt
+
+        //Initialize
+        adresse = new Adresse();
+        adressen = adresse.getAdressen();
+        getAdressesSetsFromDB();
 
         switch (type) {
             case 0:
@@ -40,26 +47,24 @@ public class AdressenErmittler extends DataGenerator {
     }
 
 
-    public void getAdressesFromDB() throws SQLException {
+    public void getAdressesSetsFromDB() throws SQLException {
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
-            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT * FROM adresse;");
-            while (rs.next()) {
-                adressen.add(new Adresse(rs.getInt("adressenid"), rs.getString("strasse"), rs.getString("ort"), rs.getInt("plz")));
-            }
-            rs = DataGenerator.stmt.executeQuery("SELECT adressenid FROM dienststelle;");
+            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT adressenid FROM dienststelle;");
             while (rs.next()) {
                 dstelladdi.add(rs.getInt("adressenid"));
             }
+            rs.close();
             rs = DataGenerator.stmt.executeQuery("SELECT adressenid FROM person;");
             while (rs.next()) {
                 personaddi.add(rs.getInt("adressenid"));
             }
+            rs.close();
             rs = DataGenerator.stmt.executeQuery("SELECT adressenid FROM delikt;");
             while (rs.next()) {
                 deliktaddi.add(rs.getInt("adressenid"));
             }
-
+            rs.close();
         } catch (Exception e) {}
     }
 
@@ -150,5 +155,10 @@ public class AdressenErmittler extends DataGenerator {
 
     public int getChoosenID() {
         return choosenID;
+    }
+
+
+    public ArrayList<Adresse> getAdressen() {
+        return adressen;
     }
 }

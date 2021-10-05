@@ -2,10 +2,7 @@ package LokiDB;
 
 import Main.DataGenerator;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.*;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -15,17 +12,15 @@ public class LokiDB extends DataGenerator {
     Random random = new Random();
     AdressenErmittler ae;
 
-    public static void main(String[] args) throws URISyntaxException, IOException, ParseException, SQLException {
+    public static void main(String[] args) throws Exception {
         LokiDB lokiDB = new LokiDB();
     }
 
 
-    public LokiDB() throws URISyntaxException, IOException, ParseException, SQLException {
-        super.closeConnection();
+    public LokiDB() throws Exception {
         super.createConnection("jdbc:postgresql://localhost:5432/LokiDB");
         getErmittler();
-        //getAdressesFromDB();
-        //generateDienststelle();
+        generateZeuge();
         //generateDelikt();
         //generateIndiz();
         super.closeConnection();
@@ -64,9 +59,9 @@ public class LokiDB extends DataGenerator {
     public Person generatePerson() throws Exception {
         ae = new AdressenErmittler(0);
         Person person = new Person(ae.getChoosenID());
-        String sql = "INSERT INTO person (" + person.getPersID() + ", " + person.getVorname() + ", " + person.getNachname() + ", " + person.getSex() + ", " + person.getGeburtsdatum() + ", " + person.getTelefon() + ", " + person.getFamilienstand() + ", " + person.getLandID() + ", " + person.getAdressenID() + ");";
+        String sql = "INSERT INTO person VALUES (" + person.getPersID() + ", '" + person.getVorname() + "', '" + person.getNachname() + "', '" + person.getSex() + "', '" + person.getGeburtsdatum() + "', '" + person.getTelefon() + "', '" + person.getFamilienstand() + "', '" + person.getLandID() + "', " + person.getAdressenID() + ");";
         System.out.println(sql);
-        //sendToDatabase(sql);
+        sendToDatabase(sql);
         return person;
     }
 
@@ -137,10 +132,10 @@ public class LokiDB extends DataGenerator {
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
             ResultSet rs = DataGenerator.stmt.executeQuery("SELECT ort FROM adresse where adressenid = " + adressid + ";");
+            rs.next();
             name = "Polizeidienststelle " + rs.getString("ort");
-            String sql = "INSERT INTO dienststelle VALUES (" + dstelleID + ", " + name + ", " + adressid + ");";
-            System.out.println(sql);
-            //super.sendToDatabase(sql);
+            String sql = "INSERT INTO dienststelle VALUES (" + dstelleID + ", '" + name + "', " + adressid + ");";
+            super.sendToDatabase(sql);
         } catch (SQLException e) {
             e.printStackTrace();
         }

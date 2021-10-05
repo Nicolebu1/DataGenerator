@@ -28,6 +28,7 @@ public class WinDBoe extends DataGenerator {
 
     public WinDBoe() throws URISyntaxException, IOException, ParseException {
         this.adress = new Adresse();
+        super.closeConnection();
         super.createConnection("jdbc:postgresql://localhost:5432/WinDBoe");
         getFilialen();
         getMitarbeiter();

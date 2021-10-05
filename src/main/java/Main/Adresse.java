@@ -25,7 +25,6 @@ public class Adresse extends DataGenerator {
     }
 
     public Adresse(int adressid, String strasse, String ort, int plz) {
-        getAdressesFromDB();
         this.adressid = adressid;
         this.strasse = strasse;
         this.ort = ort;
@@ -53,29 +52,11 @@ public class Adresse extends DataGenerator {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.exit(0);
         }
-        super.closeConnection();
     }
 
-    //-------------------------------adresses for LokiDB---------------------------------------------------------------
 
     public ArrayList<Adresse> getAdressen() {
         return adressen;
-    }
-
-    public int getAdressid() {
-        return adressid;
-    }
-
-    public String getStrasse() {
-        return strasse;
-    }
-
-    public String getOrt() {
-        return ort;
-    }
-
-    public int getPlz() {
-        return plz;
     }
 
 
@@ -96,12 +77,4 @@ public class Adresse extends DataGenerator {
     }
 
 
-    public BigDecimal getRandomLaengengrad() {
-        return laengengrade.get(super.generateRandomNumber(laengengrade.size() - 1));
-    }
-
-
-    public BigDecimal getRandomBreitengrad() {
-        return breitengrade.get(super.generateRandomNumber(breitengrade.size() - 1));
-    }
 }
