@@ -20,7 +20,7 @@ public class LokiDB extends DataGenerator {
     public LokiDB() throws Exception {
         super.createConnection("jdbc:postgresql://localhost:5432/LokiDB");
         getErmittler();
-        generateIndiz();
+        generateBeute();
         super.closeConnection();
     }
 
@@ -76,7 +76,7 @@ public class LokiDB extends DataGenerator {
         Person geschaedigter = generatePerson();
         String beruf = super.generateRandomBeruf();
         String blutgruppe = generateRandomBlutgruppe();
-        String sql = "INSERT INTO geschaedigter VALUES ('" + beruf + "', '" + blutgruppe + "', " + + geschaedigter.getPersID() + ");";
+        String sql = "INSERT INTO geschaedigter VALUES ('" + beruf + "', '" + blutgruppe + "', " + +geschaedigter.getPersID() + ");";
         super.sendToDatabase(sql);
     }
 
@@ -97,7 +97,7 @@ public class LokiDB extends DataGenerator {
         String fingerabdrucklink = generateRandomLink();
         double ergreifbel = super.generateRandomDecimal(200, 3000);
 
-        String sql = "INSERT INTO verdaechtiger VALUES (" + groesse + ", '" + pseudonym + "', '" + bandenname + "', '" +  beruf + "', '" + haarfarbe + "', " + schuhgroesse + ", '" + augenfarbe + "', '" + blutgruppe + "', '" + fotolink + "', '" + fingerabdrucklink + "', " + ergreifbel + ", " + verdaechtiger.getPersID() + ");";
+        String sql = "INSERT INTO verdaechtiger VALUES (" + groesse + ", '" + pseudonym + "', '" + bandenname + "', '" + beruf + "', '" + haarfarbe + "', " + schuhgroesse + ", '" + augenfarbe + "', '" + blutgruppe + "', '" + fotolink + "', '" + fingerabdrucklink + "', " + ergreifbel + ", " + verdaechtiger.getPersID() + ");";
         sendToDatabase(sql);
     }
 
@@ -154,7 +154,7 @@ public class LokiDB extends DataGenerator {
         double schadenshoehe;
         boolean schaden = random.nextBoolean();
         if (schaden == true) {
-            schadenshoehe = super.generateRandomDecimal(25, 30000);
+            schadenshoehe = super.generateRandomDecimal(50, 30000);
         } else {
             schadenshoehe = 0;
         }
@@ -183,56 +183,75 @@ public class LokiDB extends DataGenerator {
         //Todo : wo welche Indizien?
         int deliktid = 0;
 
-        String sql = "INSERT INTO indiz VALUES (" + indizid + ", '" + beschreibung + "', '" + funddatum + "', '" + fundzeit + "', '" + zugelBeweis + "', " + deliktid +");";
+        String sql = "INSERT INTO indiz VALUES (" + indizid + ", '" + beschreibung + "', '" + funddatum + "', '" + fundzeit + "', '" + zugelBeweis + "', " + deliktid + ");";
         super.sendToDatabase(sql);
         System.out.println(sql);
     }
 
 
-    public void generateBeute(){
+    public void generateBeute() {
+        //Beute (BeuteID, Bezeichnung, Wert, Beutetyp, Beschreibung, VersSum, Fotolink, DeliktID)
+        String sql;
+        BeuteErmittler be = new BeuteErmittler();
 
-        //Choose suitable delikttyp
-        try {
-            DataGenerator.stmt = DataGenerator.c.createStatement();
-            ResultSet rs = DataGenerator.stmt.executeQuery("SELECT deliktid FROM delikt WHERE delikttyp IN (5, 7, 13);");
+        int beuteid;
+        //Todo : bezeichnung
+        String bezeichnung = "NULL";
+        double wert;
+        //Todo : beutetyp;
+        String beutetyp = "NULL";
+        //Todo : beschreibung
+        String beschreibung = "NULL";
+        double verssum;
+        String fotolink;
+        int deliktid;
 
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+
+        for (Beute b : be.getBeuten()) {
+            beuteid = super.getHighestID("SELECT * FROM beute;", "beuteid") + 1;
+            wert = b.getWert();
+            if (!b.getBeutetyp().isEmpty()) {
+                beutetyp = b.getBeutetyp();
+            }
+            verssum = b.getVerssum();
+            fotolink = generateRandomLink();
+            deliktid = b.getDeliktid();
+            sql = "INSERT INTO Beute VALUES (" + beuteid + ", '" + bezeichnung + "', " + wert + ", '" + beutetyp + "', '" + beschreibung + "', " + verssum + ", '" + fotolink + "', " + deliktid + ");";
+            super.sendToDatabase(sql);
         }
     }
 
 
-
-        // ---------------------------------GENERATE LOKI-SPECIFIC CONTENT--------------------------------------
-
-
-        public String generateRandomBlutgruppe () {
-            String[] blutgruppen = {"A+", "A-", "B+", "B-", "AB+", "AB-", "0+", "0-"};
-            return blutgruppen[generateRandomNumber(blutgruppen.length - 1)];
-        }
+    // ---------------------------------GENERATE LOKI-SPECIFIC CONTENT--------------------------------------
 
 
-        public String generateRandomHaarfarbe () {
-            String[] haarfarben = {"Weiß", "Grau", "Blond", "Rot", "Brünett", "Hellbraun", "Dunkelbraun", "Schwarz"};
-            return haarfarben[generateRandomNumber(haarfarben.length - 1)];
-        }
-
-
-        public String generateRandomAugenfarbe () {
-            String[] augenfarben = {"Blau", "Grau", "Grün", "Braun"};
-            return augenfarben[generateRandomNumber(augenfarben.length - 1)];
-        }
-
-
-        public String generateRandomLink () {
-            return "http://polizeiinspektion.db/" + generateRandomNumber(15483, 178269);
-        }
-
-        public String generateRandomStatus () {
-            String[] status = {"wiederaufgenommen", "gelöst", "laufend", "abgelegt"};
-            return status[generateRandomNumber(status.length - 1)];
-        }
+    public String generateRandomBlutgruppe() {
+        String[] blutgruppen = {"A+", "A-", "B+", "B-", "AB+", "AB-", "0+", "0-"};
+        return blutgruppen[generateRandomNumber(blutgruppen.length - 1)];
     }
+
+
+    public String generateRandomHaarfarbe() {
+        String[] haarfarben = {"Weiß", "Grau", "Blond", "Rot", "Brünett", "Hellbraun", "Dunkelbraun", "Schwarz"};
+        return haarfarben[generateRandomNumber(haarfarben.length - 1)];
+    }
+
+
+    public String generateRandomAugenfarbe() {
+        String[] augenfarben = {"Blau", "Grau", "Grün", "Braun"};
+        return augenfarben[generateRandomNumber(augenfarben.length - 1)];
+    }
+
+
+    public String generateRandomLink() {
+        return "http://polizeiinspektion.db/" + generateRandomNumber(15483, 178269);
+    }
+
+    public String generateRandomStatus() {
+        String[] status = {"wiederaufgenommen", "gelöst", "laufend", "abgelegt"};
+        return status[generateRandomNumber(status.length - 1)];
+    }
+}
 
 
 /*      Team - Namen
