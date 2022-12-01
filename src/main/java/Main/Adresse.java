@@ -18,12 +18,11 @@ public class Adresse extends DataGenerator {
 
 
     public void getAdresses() {
-        super.createConnection("jdbc:postgresql://localhost:5432/LokiDB");
+        super.createConnection("jdbc:postgresql://localhost:5433/LokiDB");
         try {
             //get all adresses from loki
             DataGenerator.stmt = DataGenerator.c.createStatement();
             ResultSet rs = DataGenerator.stmt.executeQuery("SELECT * FROM adresse;");
-            int i = 0;
             while (rs.next()) {
                 strassen.add(rs.getString("strasse"));
                 plzs.add(rs.getInt("plz"));

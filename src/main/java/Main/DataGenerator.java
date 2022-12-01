@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+
 import java.util.Calendar;
 
 public class DataGenerator {
@@ -18,7 +17,7 @@ public class DataGenerator {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
                     .getConnection(url,
-                            "postgres", "0000");
+                            "postgres", "postgres");
             c.setAutoCommit(true);
             System.out.println("Connection successful");
         } catch (Exception e) {
@@ -27,6 +26,12 @@ public class DataGenerator {
         }
     }
 
+    public static void main(String[] args) throws URISyntaxException, IOException, ParseException {
+        DataGenerator dg = new DataGenerator();
+        dg.createConnection("jdbc:postgresql://localhost:5433/LokiDB");
+    }
+
+
 
     public void closeConnection() {
         try {
@@ -34,14 +39,27 @@ public class DataGenerator {
             c.close();
             System.out.println("Connection closed");
         } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
+    //send queries to database
+    public static void sendToDatabase(String sql) {
+        System.out.println(sql);
+        try {
+            stmt = c.createStatement();
+            stmt.execute(sql);
+            System.out.println("Inserted.");
+        } catch (
+                Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
 
     //get latest ID
     public int getHighestID(String query, String column) {
-        int highestID = -1;
+        int highestID = 0;
         try {
             DataGenerator.stmt = DataGenerator.c.createStatement();
             ResultSet rs = DataGenerator.stmt.executeQuery(query);
@@ -144,7 +162,8 @@ public class DataGenerator {
         int number1 = 100 + getRandomNumber(899);
         int number2 = 10 + getRandomNumber(89);
         int number3 = 10 + getRandomNumber(89);
-        return "06" + number + " " + number1 + " " + number2 + " " + number3;
+        int number4 = 10 + getRandomNumber(89);
+        return "06" + number + " " + number1 + " " + number2 + " " + number3 + " " + number4;
     }
 
     public char generateRandomSex(){
@@ -158,6 +177,11 @@ public class DataGenerator {
         {
             return 'm';
         }
+    }
+
+    public String generateRandomMaritalStatus(){
+        String[] ms = {"ledig", "verheiratet", "einegetragene_Lebenspartnerschaft", "verwitwet", "geschieden"};
+        return ms[getRandomNumber(4)];
     }
 }
 
