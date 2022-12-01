@@ -18,7 +18,6 @@ public class WinDBoe extends DataGenerator {
     ArrayList<Produkt> Produkte = new ArrayList<>();
     ArrayList<Mitarbeiter> Mitarbeiter = new ArrayList<>();
     ArrayList<Integer> fhmids = new ArrayList<Integer>();
-
     Adresse adress;
     Random random = new Random();
 
@@ -29,47 +28,17 @@ public class WinDBoe extends DataGenerator {
 
     public WinDBoe() throws URISyntaxException, IOException, ParseException {
         this.adress = new Adresse();
-        super.createConnection("jdbc:postgresql://localhost:5433/WinDBoe");
-        //getFilialen();
-        //getMitarbeiter();
-        //getProdukte();
-        //getFirmenhandys();
-        for (int i = 0; i < 7; i++) {
-            createDemoTeiln();
-        }
-    }
-
-
-    //send queries to database
-    public void sendToWBDatabase(String sql) {
-        DataGenerator.sendToDatabase(sql);
+        super.closeConnection();
+        super.createConnection("jdbc:postgresql://localhost:5432/WinDBoe");
+        getFilialen();
+        getMitarbeiter();
+        getProdukte();
+        getFirmenhandys();
+        super.closeConnection();
     }
 
 
     //--------------Get data from Database-----------------------
-
-    public void createDemoTeiln() throws URISyntaxException, IOException {
-        String vorname = super.generateRandomVorname();
-        String nachname = super.generateRandomNachname();
-        String ort = adress.getRandomOrt();
-        String email = generateEmail();
-
-        boolean emailanf = random.nextBoolean();
-
-        String sql;
-
-        if (emailanf) {
-            sql = "INSERT INTO teilnahme (vorname, nachname, ort, email) VALUES ('" + vorname + " " + nachname + ort + "', '" + email + "');";
-        }
-        else {
-            sql = "INSERT INTO teilnahme (vorname, nachname, ort) VALUES ('" + ort + "');";
-        }
-        System.out.println(sql);
-    }
-
-    public String generateEmail(){
-        return "vorname"+'.'+"nachname"+"@email.db";
-    }
 
     public void getProdukte() {
         try {
@@ -146,7 +115,7 @@ public class WinDBoe extends DataGenerator {
 
 
     public Filiale getRandomFiliale() {
-        return Filialen.get(getRandomNumber(Filialen.size() - 1));
+        return Filialen.get(generateRandomNumber(Filialen.size() - 1));
     }
 
 
@@ -160,12 +129,12 @@ public class WinDBoe extends DataGenerator {
             }
         }
         //choose Mitarbeiter
-        return FilialenMitarbeiter.get(getRandomNumber(FilialenMitarbeiter.size() - 1));
+        return FilialenMitarbeiter.get(generateRandomNumber(FilialenMitarbeiter.size() - 1));
     }
 
 
     public Mitarbeiter getRandomMitarbeiter() {
-        return Mitarbeiter.get(getRandomNumber(Mitarbeiter.size() - 1));
+        return Mitarbeiter.get(generateRandomNumber(Mitarbeiter.size() - 1));
     }
 
 
@@ -185,11 +154,11 @@ public class WinDBoe extends DataGenerator {
         int mid = getRandomMitarbeiterFromFiliale(fid).getMid();
 
         //choose Produkte
-        int numberOfProdukte = 1 + getRandomNumber(14);         //note: Produkteanzahl can't be 0
+        int numberOfProdukte = 1 + generateRandomNumber(14);         //note: Produkteanzahl can't be 0
         ArrayList<Produkt> buyed = new ArrayList<>();
 
         for (int i = 0; i < numberOfProdukte; i++) {
-            buyed.add(Produkte.get(getRandomNumber(Produkte.size() - 1)));
+            buyed.add(Produkte.get(generateRandomNumber(Produkte.size() - 1)));
         }
 
         //count different Produkte
@@ -216,13 +185,13 @@ public class WinDBoe extends DataGenerator {
                 "VALUES (" + vid + ", '" + verkaufsdatum + "', " + verkaufspreis + " ," + fid + " ," + mid + ");";
 
         //insert into Database
-        sendToWBDatabase(sql);
+        super.sendToDatabase(sql);
 
         //insert into Verkaufsposition
         verkaufsposition.forEach((key, value) -> {
             String sql2 = "INSERT INTO verkaufsposition (menge, vid, pid) " +
                     "VALUES (" + value + ", " + vid + ", " + key + ");";
-            sendToWBDatabase(sql2);
+            super.sendToDatabase(sql2);
         });
     }
 
@@ -248,7 +217,7 @@ public class WinDBoe extends DataGenerator {
 
         //set specific data
         double bg = super.generateRandomDecimal(2100, 3750);
-        Enum taetigkeit = Taetigkeit.values()[getRandomNumber(Taetigkeit.values().length)];
+        Enum taetigkeit = Taetigkeit.values()[generateRandomNumber(Taetigkeit.values().length)];
 
         //generate Mitarbeiterausweis
         int maid = generateMitarbeiterausweis(mid);
@@ -264,25 +233,25 @@ public class WinDBoe extends DataGenerator {
         String sql;
 
         if (vorgesID == 0) {
-            sql = "INSERT INTO mitarbeiter (mid, vorname, nachname, strasse, plz, ort, bg, taetigkeit, fid, geburtsdatum, maid VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", '" + geburtsdatum + "', " + maid + ");";
+            sql = "INSERT INTO mitarbeiter (mid, vorname, nachname, strasse, plz, ort, bg, taetigkeit, fid, geburtsdatum, maid) VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", '" + geburtsdatum + "', " + maid + ");";
         } else {
             sql = "INSERT INTO mitarbeiter VALUES (" + mid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', " + bg + ", '" + taetigkeit + "', " + fid + ", " + vorgesID + ", '" + geburtsdatum + "', " + maid + ");";
         }
 
-        sendToWBDatabase(sql);
+        super.sendToDatabase(sql);
     }
 
 
     public int generateMitarbeiterausweis(int mid) {
         int maid = 1000 + mid;
-        String berechtigungen = "Stufe: " + super.getRandomNumber(5);
+        String berechtigungen = "Stufe: " + super.generateRandomNumber(5);
         Date gueltigBis = super.generateRandomDate(2021, 2023);
 
 
         String sql = "INSERT INTO mitarbeiterausweis " +
                 "VALUES (" + maid + ", '" + berechtigungen + "', '" + gueltigBis + "');";
 
-        sendToWBDatabase(sql);
+        super.sendToDatabase(sql);
         return maid;
     }
 
@@ -307,7 +276,7 @@ public class WinDBoe extends DataGenerator {
 
         String sql = "INSERT INTO kunde VALUES (" + kdid + ", '" + vorname + "', '" + nachname + "', '" + strasse + "', " + plz + ", '" + ort + "', '" + geburtsdatum + "', '" + email + "', '" + telnr + "', " + newsletter + ");";
 
-        sendToWBDatabase(sql);
+        super.sendToDatabase(sql);
     }
 
 
@@ -338,7 +307,7 @@ public class WinDBoe extends DataGenerator {
         } else {
             sql = "INSERT INTO firmenhandy (fhid, telnr) VALUES (" + fhid + ", '" + number + "');";
         }
-        sendToWBDatabase(sql);
+        super.sendToDatabase(sql);
     }
 
 
@@ -348,7 +317,7 @@ public class WinDBoe extends DataGenerator {
         int plz = adress.getRandomPlz();
         String ort = adress.getRandomOrt();
         String sql = "INSERT INTO filiale VALUES (" + fid + ", '" + strasse + "', " + plz + ", '" + ort + "');";
-        sendToWBDatabase(sql);
+        super.sendToDatabase(sql);
     }
 
 
@@ -358,7 +327,7 @@ public class WinDBoe extends DataGenerator {
         //set cooperate form
         String[] cooperateform = {"OG", "KG", "Co.KG", "AG"};
 
-        String lieferantenname = super.generateRandomNachname() + " " + cooperateform[super.getRandomNumber(cooperateform.length - 1)];
+        String lieferantenname = super.generateRandomNachname() + " " + cooperateform[super.generateRandomNumber(cooperateform.length - 1)];
         double rechnungsbetrag = super.generateRandomDecimal(100, 15000);
         Date rechnungsdatum = super.generateRandomDate(2021, 2022);
 
@@ -377,6 +346,6 @@ public class WinDBoe extends DataGenerator {
         else {
             sql = "INSERT INTO verbindlichkeit (rechnungsnummer, lieferantenname, rechnungsbetrag, rechnungsdatum, fid) VALUES (" + rechnungsnummer + ", '" + lieferantenname + "', " + rechnungsbetrag + ", '" + rechnungsdatum + "', " + fid + ");";
         }
-        sendToWBDatabase(sql);
+        super.sendToDatabase(sql);
     }
 }

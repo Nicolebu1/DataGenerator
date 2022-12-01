@@ -46,5 +46,6 @@ public class Namen {
     public List<String> getVornamenM() {
         return VornamenM;
     }
+
 }
 

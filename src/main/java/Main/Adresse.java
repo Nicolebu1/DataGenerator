@@ -6,18 +6,33 @@ import java.util.ArrayList;
 
 public class Adresse extends DataGenerator {
 
+    //generating randoms
     ArrayList<String> strassen = new ArrayList<>();
     ArrayList<Integer> plzs = new ArrayList<>();
     ArrayList<String> orte = new ArrayList<>();
     ArrayList<BigDecimal> laengengrade = new ArrayList<>();
     ArrayList<BigDecimal> breitengrade = new ArrayList<>();
 
+    //Loki
+    ArrayList<Adresse> adressen = new ArrayList<>();
+    int adressid;
+    String strasse;
+    String ort;
+    int plz;
+
     public Adresse() {
-        getAdresses();
+        getAdressesFromDB();
+    }
+
+    public Adresse(int adressid, String strasse, String ort, int plz) {
+        this.adressid = adressid;
+        this.strasse = strasse;
+        this.ort = ort;
+        this.plz = plz;
     }
 
 
-    public void getAdresses() {
+    public void getAdressesFromDB() {
         super.createConnection("jdbc:postgresql://localhost:5433/LokiDB");
         try {
             //get all adresses from loki
@@ -29,6 +44,7 @@ public class Adresse extends DataGenerator {
                 orte.add(rs.getString("ort"));
                 laengengrade.add(rs.getBigDecimal("laengengrad"));
                 breitengrade.add(rs.getBigDecimal("breitengrad"));
+                adressen.add(new Adresse(rs.getInt("adressenid"), rs.getString("strasse"), rs.getString("ort"), rs.getInt("plz")));
             }
             rs.close();
         } catch (Exception e) {
@@ -38,28 +54,33 @@ public class Adresse extends DataGenerator {
         super.closeConnection();
     }
 
+    public ArrayList<Adresse> getAdressen() {
+        return adressen;
+    }
+
+    //-------------------------------generate random adresses for other DBs than LokiDB--------------------------------
 
     public String getRandomStrasse() {
-        return strassen.get(super.getRandomNumber(strassen.size() - 1));
+        return strassen.get(super.generateRandomNumber(strassen.size() - 1));
     }
 
 
     public Integer getRandomPlz() {
-        return plzs.get(super.getRandomNumber(plzs.size() - 1));
+        return plzs.get(super.generateRandomNumber(plzs.size() - 1));
     }
 
 
     public String getRandomOrt() {
-        return orte.get(super.getRandomNumber(orte.size() - 1));
+        return orte.get(super.generateRandomNumber(orte.size() - 1));
     }
 
-
     public BigDecimal getRandomLaengengrad() {
-        return laengengrade.get(super.getRandomNumber(laengengrade.size() - 1));
+        return laengengrade.get(super.generateRandomNumber(laengengrade.size() - 1));
     }
 
 
     public BigDecimal getRandomBreitengrad() {
-        return breitengrade.get(super.getRandomNumber(breitengrade.size() - 1));
+        return breitengrade.get(super.generateRandomNumber(breitengrade.size() - 1));
     }
+
 }
